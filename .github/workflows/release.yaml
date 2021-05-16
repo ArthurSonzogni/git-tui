@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  create:
+    tags:
+      -v*
+
+jobs:
+  build:
+    name: Release 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Build
+        run: >
+          mkdir build;
+          cd build;
+          cmake ..
+          -DCMAKE_CXX_COMPILER=clang++-9;
+          cmake --build . --config Release;
+          make package;
+      - name: Upload 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/git-diff-tui-*
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
