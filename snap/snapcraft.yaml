@@ -4,7 +4,7 @@ summary: A human friendly version of "git diff", with a terminal UI.
 description: A human friendly version of "git diff", with a terminal UI.
 
 grade: stable
-confinement: strict
+confinement: classic
 base: core18
 
 apps:
