@@ -16,5 +16,5 @@ jobs:
           mkdir build;
           cd build;
           cmake ..
-          -DCMAKE_CXX_COMPILER=clang++-9;
+          -DCMAKE_CXX_COMPILER=clang++;
           cmake --build . --config Release;
