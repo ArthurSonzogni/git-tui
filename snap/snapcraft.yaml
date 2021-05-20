@@ -4,7 +4,7 @@ summary: A human friendly version of "git diff", with a terminal UI.
 description: A human friendly version of "git diff", with a terminal UI.
 
 grade: stable
-confinement: classic
+confinement: strict
 base: core18
 
 apps:
@@ -18,6 +18,8 @@ parts:
     source-type: git
     source-depth: 1
     build-snaps: [cmake/latest/edge] # We need cmake >= 3.11
+    stage-packages:
+    - git
     override-build: |
       /snap/bin/cmake \
         -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
