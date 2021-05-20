@@ -17,7 +17,7 @@ parts:
     source: https://github.com/ArthurSonzogni/git-diff-tui
     source-type: git
     source-depth: 1
-    build-snaps: [cmake/latest/edge] # We need cmake >= 3.11
+    build-snaps: [cmake/latest/edge] # We need a modern cmake.
     stage-packages:
     - git
     override-build: |
