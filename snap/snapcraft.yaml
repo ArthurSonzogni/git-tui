@@ -1,7 +1,7 @@
-name: git-diff-tui
-version: '1.0.1'
-summary: A human friendly version of "git diff", with a terminal UI.
-description: A human friendly version of "git diff", with a terminal UI.
+name: git-tui
+adopt-info: git-tui
+summary: A collection of human friendly terminal interfaces for git.
+description: A collection of human friendly terminal interfaces for git.
 
 grade: stable
 confinement: strict
@@ -10,11 +10,13 @@ base: core18
 apps:
   git-diff-tui:
     command: git-diff-tui
+  git-tui:
+    command: git-tui
 
 parts:
-  git-diff-tui:
+  git-tui:
     plugin: cmake
-    source: https://github.com/ArthurSonzogni/git-diff-tui
+    source: https://github.com/ArthurSonzogni/git-tui
     source-type: git
     source-depth: 1
     build-snaps: [cmake/latest/edge] # We need a modern cmake.
@@ -27,7 +29,8 @@ parts:
         $SNAPCRAFT_PART_SRC
       make -j 4
       make install
+      snapcraftctl set-version "1.1.$(git rev-list --count HEAD)"
 
 passthrough:
-  title: git-diff-tui
+  title: git-tui
   license: MIT

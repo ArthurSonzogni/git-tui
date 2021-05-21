@@ -1,3 +1,4 @@
+#include <iostream>
 #include <array>
 #include <cstdio>
 #include <iostream>
@@ -184,7 +185,8 @@ Component Scroller(Component child) {
   return Make<ScrollerBase>(std::move(child));
 }
 
-int main(int argc, const char** argv) {
+
+int diff(int argc, const char** argv) {
   using namespace ftxui;
 
   std::string args;
@@ -288,4 +290,33 @@ int main(int argc, const char** argv) {
   screen.Loop(container);
 
   return EXIT_SUCCESS;
+}
+
+int help() {
+  auto document =
+      window(text(L" git tui "), vbox({
+      text(L"Available interfaces:"),
+      text(L"  - git diff-tui"),
+      text(L""),
+  }));
+  auto screen =
+      Screen::Create(Dimension::Full(), Dimension::Fit(document));
+  Render(screen, document);
+  screen.Print();
+  return EXIT_SUCCESS;
+}
+
+int main(int argc, const char** argv) {
+  if (argc == 0)
+    return EXIT_FAILURE;
+
+  std::string command = argv[0];
+  if (command.find("git-diff-tui", 0) != std::string::npos)
+    return diff(argc, argv);
+
+  if (command.find("git-tui", 0) != std::string::npos)
+    return help();
+
+  std::cout << "Command " << command << " is not implemented" << std::endl;
+  return EXIT_FAILURE;
 }

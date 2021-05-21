@@ -1,25 +1,25 @@
 <p align="center">
-  <br><img src="logo.png" alt="git diff-tui" /><br>
+  <br><img src="logo.png" alt="git tui" /><br>
 </p>
 
-<h1 align="center">git diff-tui</h1>
+<h1 align="center">git tui</h1>
 
-<h3 align="center">A human friendly git diff, running in the terminal.</h3>
-
-
+<h3 align="center">
+  A collection of human friendly terminal user interface for git.
+</h3>
 
 <p align="center">
-  <a href="https://github.com/ArthurSonzogni/git-diff-tui/actions?workflow=linux-clang.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-diff-tui/actions/workflows/linux-clang.yaml/badge.svg?branch=master" alt="GitHub action linux clang">
+  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=linux-clang.yaml">
+    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/linux-clang.yaml/badge.svg?branch=master" alt="GitHub action linux clang">
   </a>
-  <a href="https://github.com/ArthurSonzogni/git-diff-tui/actions?workflow=linux-gcc.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-diff-tui/actions/workflows/linux-gcc.yaml/badge.svg?branch=master" alt="GitHub action linux gcc">
+  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=linux-gcc.yaml">
+    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/linux-gcc.yaml/badge.svg?branch=master" alt="GitHub action linux gcc">
   </a>
-  <a href="https://github.com/ArthurSonzogni/git-diff-tui/actions?workflow=mac-clang.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-diff-tui/actions/workflows/mac-clang.yaml/badge.svg?branch=master" alt="GitHub action mac clang">
+  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=mac-clang.yaml">
+    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/mac-clang.yaml/badge.svg?branch=master" alt="GitHub action mac clang">
   </a>
-  <a href="https://github.com/ArthurSonzogni/git-diff-tui/blob/master/LICENSE.md">
-    <img src="https://img.shields.io/github/license/ArthurSonzogni/git-diff-tui" alt="LICENSE">
+  <a href="https://github.com/ArthurSonzogni/git-tui/blob/master/LICENSE.md">
+    <img src="https://img.shields.io/github/license/ArthurSonzogni/git-tui" alt="LICENSE">
   </a>
 </p>
 
@@ -31,23 +31,25 @@
 </p>
 
 # Demo
+
+### git diff-tui:
 ![Demo](./demo.gif)
 
 # Install
 
 ### Snap:
-[![git-diff-tui](https://snapcraft.io/git-diff-tui/badge.svg)](https://snapcraft.io/git-diff-tui)
+[![git-tui](https://snapcraft.io/git-tui/badge.svg)](https://snapcraft.io/git-tui)
 ```bash
-sudo snap install git-diff-tui
+sudo snap install git-tui
 ```
 ### From binaries:
 
-10 different packages (deb, rpm, sh, zip, tar.gz, etc...): [Latest](https://github.com/ArthurSonzogni/git-diff-tui/releases/latest).
+10 different packages (deb, rpm, sh, zip, tar.gz, etc...): [Latest](https://github.com/ArthurSonzogni/git-tui/releases/latest).
 
 ### From source:
 ```bash
-git clone https://github.com/ArthurSonzogni/git-diff-tui;
-cd git-diff-tui;
+git clone https://github.com/ArthurSonzogni/git-tui;
+cd git-tui;
 mkdir build;
 cd build;
 cmake ..;
@@ -55,8 +57,15 @@ sudo make install -j;
 ```
 # Usage
 
-The commands `git diff` and `git diff-tui` are interchangeable. They both accept the same options.
+Apprend "-tui" to the usual git command. The same arguments are supported.
+
+Available commands:
+```bash
+git diff-tui
+```
+
+More to be added...
 
 # Contribute
 
-If you like `git diff-tui` and you find it useful, there are ways for you to contribute. You can suggest improvement or propose your own pull requests.
+If you like `git tui` and you find it useful, there are ways for you to contribute. You can suggest improvement or propose your own pull requests.

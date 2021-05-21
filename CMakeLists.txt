@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.14)
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
@@ -30,19 +30,19 @@ else()
 endif()
 
 
-project(git-diff-tui
+project(git-tui
   LANGUAGES CXX
-  VERSION 1.0.${git_version}
+  VERSION 1.1.${git_version}
   )
 
-add_executable(git-diff-tui
+add_executable(git-tui
   src/diff.cpp
   src/diff.hpp
   src/main.cpp
   )
-target_include_directories(git-diff-tui PRIVATE src)
+target_include_directories(git-tui PRIVATE src)
 
-target_link_libraries(git-diff-tui
+target_link_libraries(git-tui
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component # Not needed for this example.
@@ -50,7 +50,7 @@ target_link_libraries(git-diff-tui
 
 if (MSVC)
 else()
-  target_compile_options(git-diff-tui
+  target_compile_options(git-tui
     PRIVATE "-Wall"
     PRIVATE "-Wextra"
     PRIVATE "-pedantic"
@@ -61,20 +61,26 @@ else()
 endif()
 
 # C++17 is used. We requires fold expressions at least.
-set_target_properties(git-diff-tui PROPERTIES CXX_STANDARD 17)
+set_target_properties(git-tui PROPERTIES CXX_STANDARD 17)
 
-install(TARGETS git-diff-tui RUNTIME DESTINATION "bin")
+add_custom_target(git-diff-tui ALL
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+    "git-tui"
+    ${CMAKE_CURRENT_BINARY_DIR}/git-diff-tui
+  )
 
+install(TARGETS git-tui RUNTIME DESTINATION "bin")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/git-diff-tui DESTINATION "bin")
 
 # ------------------------------------------------------------------------------
 set(CPACK_GENERATOR "DEB;External;RPM;STGZ;TBZ2;TGZ;TXZ;TZ;TZST;ZIP")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS " ")
-set(CPACK_DEBIAN_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-diff-tui/")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-tui/")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
 set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A human friendly git diff with a terminal UI.")
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-diff-tui/")
-set(CPACK_PACKAGE_NAME "git-diff-tui")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-tui/")
+set(CPACK_PACKAGE_NAME "git-tui")
 set(CPACK_PACKAGE_VENDOR "Arthur Sonzogni")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
