@@ -20,19 +20,20 @@ endif()
 find_package(Git QUIET)
 if (Git_FOUND)
   execute_process(
-    COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
+    COMMAND ${GIT_EXECUTABLE} describe --tags
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE git_version
+    OUTPUT_VARIABLE git_tag
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+  string(SUBSTRING ${git_tag} 1 1000 git_tag)
 else()
-  set(git_version 0)
+  set(git_tag 0)
 endif()
 
 
 project(git-tui
   LANGUAGES CXX
-  VERSION 1.1.${git_version}
+  VERSION ${git_tag}
   )
 
 add_executable(git-tui
