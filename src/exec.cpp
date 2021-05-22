@@ -1,6 +1,9 @@
 #include "exec.hpp"
 
+#include <array>
 #include <cstdio>
+#include <memory>
+#include <stdexcept>
 
 std::string exec(const char* cmd) {
   std::array<char, 128> buffer;
