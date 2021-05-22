@@ -1,32 +1,19 @@
-#include <iostream>
 #include <array>
-#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include "diff.hpp"
+#include "environment.h"
+#include "exec.hpp"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/screen/string.hpp"
-#include "environment.h"
+#include "scroller.hpp"
 
 using namespace ftxui;
-
-std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-    return result;
-}
 
 Element RenderSplit(const Hunk& hunk) {
   Elements left_line_numbers;
@@ -242,9 +229,6 @@ int diff(int argc, const char** argv) {
   screen.Loop(container);
 
   return EXIT_SUCCESS;
-}
-
-int log(int argc, const char** argv) {
 }
 
 int help(int argc, const char** argv) {

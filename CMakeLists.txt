@@ -25,7 +25,9 @@ if (Git_FOUND)
     OUTPUT_VARIABLE git_tag
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-  string(SUBSTRING ${git_tag} 1 1000 git_tag)
+  string(REGEX REPLACE "v\(.*\)-.*" "\\1" git_tag ${git_tag})
+  string(REGEX REPLACE "-" "."  git_tag ${git_tag})
+  message(STATUS ${git_tag})
 else()
   set(git_tag 0)
 endif()
@@ -42,6 +44,8 @@ add_executable(git-tui
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp
+  src/exec.cpp
+  src/exec.hpp
   )
 
 target_include_directories(git-tui
