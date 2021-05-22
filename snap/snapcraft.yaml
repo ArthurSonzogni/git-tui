@@ -18,7 +18,6 @@ parts:
     plugin: cmake
     source: https://github.com/ArthurSonzogni/git-tui
     source-type: git
-    source-depth: 1
     build-snaps: [cmake/latest/edge] # We need a modern cmake.
     stage-packages:
       - git
