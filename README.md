@@ -57,7 +57,7 @@ sudo make install -j;
 ```
 # Usage
 
-Replace "git" by "git tui" and use the usual commands.
+Replace `git` by `git tui` and use the usual commands and arguments.
 
 Available commands:
 ```bash
