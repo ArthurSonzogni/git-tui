@@ -129,7 +129,7 @@ int diff(int argc, const char** argv) {
   using namespace ftxui;
 
   std::string args;
-  for (int i = 1; i < argc; ++i) {
+  for (int i = 0; i < argc; ++i) {
     args += argv[i];
     args += " ";
   }
