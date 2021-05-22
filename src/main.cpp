@@ -11,6 +11,7 @@
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/screen/string.hpp"
+#include "environment.h"
 
 using namespace ftxui;
 
@@ -292,31 +293,36 @@ int diff(int argc, const char** argv) {
   return EXIT_SUCCESS;
 }
 
-int help() {
-  auto document =
-      window(text(L" git tui "), vbox({
-      text(L"Available interfaces:"),
-      text(L"  - git diff-tui"),
-      text(L""),
-  }));
-  auto screen =
-      Screen::Create(Dimension::Full(), Dimension::Fit(document));
-  Render(screen, document);
-  screen.Print();
+int help(int argc, const char** argv) {
+  (void)argc;
+  (void)argv;
+  std::cout << "Usage: " << std::endl;
+  std::cout << " - git tui diff [args]*" << std::endl;
+  std::cout << "" << std::endl;
+  return EXIT_SUCCESS;
+}
+
+int version(int argc, const char** argv) {
+  (void)argc;
+  (void)argv;
+  std::cout << project_version << std::endl;
   return EXIT_SUCCESS;
 }
 
 int main(int argc, const char** argv) {
   if (argc == 0)
-    return EXIT_FAILURE;
+    return help(argc, argv);
+
+  // Eat the first argument.
+  argc--;
+  argv++;
 
   std::string command = argv[0];
-  if (command.find("git-diff-tui", 0) != std::string::npos)
+  if (command == "diff")
     return diff(argc, argv);
 
-  if (command.find("git-tui", 0) != std::string::npos)
-    return help();
+  if (command == "version")
+    return version(argc, argv);
 
-  std::cout << "Command " << command << " is not implemented" << std::endl;
-  return EXIT_FAILURE;
+  return help(argc, argv);
 }

@@ -8,8 +8,6 @@ confinement: strict
 base: core18
 
 apps:
-  git-diff-tui:
-    command: git-diff-tui
   git-tui:
     command: git-tui
 
@@ -21,15 +19,16 @@ parts:
     source-depth: 1
     build-snaps: [cmake/latest/edge] # We need a modern cmake.
     stage-packages:
-    - git
+      - git
     override-build: |
       /snap/bin/cmake \
-        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
+        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL\
         -DCMAKE_BUILD_TYPE=Release \
         $SNAPCRAFT_PART_SRC
       make -j 4
       make install
-      snapcraftctl set-version "1.1.$(git rev-list --count HEAD)"
+      GIT_TUI_VERSION=`$SNAPCRAFT_PART_INSTALL/bin/git-tui version`;
+      snapcraftctl set-version "${GIT_TUI_VERSION}"
 
 passthrough:
   title: git-tui

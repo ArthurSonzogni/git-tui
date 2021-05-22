@@ -40,7 +40,11 @@ add_executable(git-tui
   src/diff.hpp
   src/main.cpp
   )
-target_include_directories(git-tui PRIVATE src)
+
+target_include_directories(git-tui
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
 
 target_link_libraries(git-tui
   PRIVATE ftxui::screen
@@ -63,14 +67,17 @@ endif()
 # C++17 is used. We requires fold expressions at least.
 set_target_properties(git-tui PROPERTIES CXX_STANDARD 17)
 
-add_custom_target(git-diff-tui ALL
-  COMMAND ${CMAKE_COMMAND} -E create_symlink
-    "git-tui"
-    ${CMAKE_CURRENT_BINARY_DIR}/git-diff-tui
-  )
+
+# ------------------------------------------------------------------------------
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/environment.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/src/environment.h
+)
+
+# ------------------------------------------------------------------------------
 
 install(TARGETS git-tui RUNTIME DESTINATION "bin")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/git-diff-tui DESTINATION "bin")
 
 # ------------------------------------------------------------------------------
 set(CPACK_GENERATOR "DEB;External;RPM;STGZ;TBZ2;TGZ;TXZ;TZ;TZST;ZIP")
@@ -78,7 +85,7 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS " ")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-tui/")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
 set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A human friendly git diff with a terminal UI.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A collection of human friend git command with terminal UI")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-tui/")
 set(CPACK_PACKAGE_NAME "git-tui")
 set(CPACK_PACKAGE_VENDOR "Arthur Sonzogni")
@@ -86,7 +93,6 @@ set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
 include(CPack)
