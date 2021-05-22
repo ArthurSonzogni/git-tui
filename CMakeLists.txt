@@ -40,6 +40,8 @@ add_executable(git-tui
   src/diff.cpp
   src/diff.hpp
   src/main.cpp
+  src/scroller.cpp
+  src/scroller.hpp
   )
 
 target_include_directories(git-tui
