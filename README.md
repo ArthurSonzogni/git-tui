@@ -57,11 +57,11 @@ sudo make install -j;
 ```
 # Usage
 
-Apprend "-tui" to the usual git command. The same arguments are supported.
+Replace "git" by "git tui" and use the usual commands.
 
 Available commands:
 ```bash
-git diff-tui
+git tui diff
 ```
 
 More to be added...
