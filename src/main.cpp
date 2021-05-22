@@ -269,7 +269,7 @@ int diff(int argc, const char** argv) {
 
   auto option_renderer = Renderer(options, [&] {
     return hbox({
-        text(L"[git diff-tui]"),
+        text(L"[git tui diff]"),
         filler(),
         split_checkbox->Render(),
         text(L"   Context:"),
@@ -317,7 +317,15 @@ int main(int argc, const char** argv) {
   argc--;
   argv++;
 
+  if (argc == 0)
+    return help(argc, argv);
+
   std::string command = argv[0];
+
+  // Eat the second argument.
+  argc--;
+  argv++;
+
   if (command == "diff")
     return diff(argc, argv);
 

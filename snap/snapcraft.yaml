@@ -10,6 +10,8 @@ base: core18
 apps:
   git-tui:
     command: git-tui
+    plugs:
+      - home
 
 parts:
   git-tui:
