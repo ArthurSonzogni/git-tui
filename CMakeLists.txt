@@ -17,6 +17,7 @@ endif()
 
 # ------------------------------------------------------------------------------
 
+set(git_tag 0)
 find_package(Git QUIET)
 if (Git_FOUND)
   execute_process(
@@ -28,8 +29,6 @@ if (Git_FOUND)
   string(REGEX REPLACE "v\(.*\)-.*" "\\1" git_tag ${git_tag})
   string(REGEX REPLACE "v" "" git_tag ${git_tag})
   string(REGEX REPLACE "-" "."  git_tag ${git_tag})
-else()
-  set(git_tag 0)
 endif()
 
 
