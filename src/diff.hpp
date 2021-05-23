@@ -14,7 +14,6 @@ struct Line {
   std::wstring content;
 };
 
-
 struct Hunk {
   int left_start;
   int right_start;
@@ -30,3 +29,7 @@ struct File {
 std::vector<File> Parse(std::string input);
 
 #endif /* end of include guard: GIT_DIFF_TUI_DIFF_HPP */
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.

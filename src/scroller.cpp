@@ -1,6 +1,17 @@
 #include "scroller.hpp"
-#include <ftxui/component/component_base.hpp>
-#include <ftxui/component/event.hpp>
+
+#include <algorithm>                           // for max, min
+#include <ftxui/component/component_base.hpp>  // for ComponentBase
+#include <ftxui/component/event.hpp>  // for Event, Event::ArrowDown, Event::ArrowUp
+#include <memory>   // for shared_ptr, allocator, __shared_ptr_access
+#include <utility>  // for move
+
+#include "ftxui/component/component.hpp"  // for Component, Make
+#include "ftxui/component/mouse.hpp"  // for Mouse, Mouse::WheelDown, Mouse::WheelUp
+#include "ftxui/dom/elements.hpp"  // for operator|, text, Element, size, vbox, EQUAL, HEIGHT, dbox, reflect, focus, inverted, nothing, select, yflex, yframe
+#include "ftxui/dom/node.hpp"      // for Node
+#include "ftxui/dom/requirement.hpp"  // for Requirement
+#include "ftxui/screen/box.hpp"       // for Box
 
 namespace ftxui {
 
@@ -53,3 +64,7 @@ Component Scroller(Component child) {
   return Make<ScrollerBase>(std::move(child));
 }
 }  // namespace ftxui
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.

@@ -1,9 +1,11 @@
 #include "diff.hpp"
-#include <assert.h>
-#include <ftxui/screen/string.hpp>
-#include <iostream>
-#include <regex>
-#include <sstream>
+
+#include <assert.h>                 // for assert
+#include <algorithm>                // for max
+#include <ftxui/screen/string.hpp>  // for to_wstring
+#include <iostream>  // for stringstream, basic_ios, basic_istream
+#include <memory>    // for allocator_traits<>::value_type
+#include <regex>  // for regex_match, match_results, match_results<>::_Base_type, sub_match, regex, smatch
 
 std::vector<File> Parse(std::string input) {
   std::stringstream ss(input);
@@ -78,3 +80,7 @@ std::vector<File> Parse(std::string input) {
   }
   return files;
 }
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.

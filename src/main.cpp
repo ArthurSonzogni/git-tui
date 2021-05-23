@@ -1,17 +1,22 @@
-#include <array>
-#include <iostream>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include "diff.hpp"
-#include "environment.h"
-#include "exec.hpp"
-#include "ftxui/component/component.hpp"
-#include "ftxui/component/screen_interactive.hpp"
-#include "ftxui/dom/elements.hpp"
-#include "ftxui/screen/screen.hpp"
-#include "ftxui/screen/string.hpp"
-#include "scroller.hpp"
+#include <stdlib.h>  // for EXIT_SUCCESS
+#include <iostream>  // for operator<<, endl, basic_ostream, cout, ostream
+#include <memory>    // for allocator, shared_ptr, __shared_ptr_access
+#include <string>  // for wstring, operator+, char_traits, basic_string, string, operator==, to_string
+#include <utility>  // for move
+#include <vector>   // for vector
+
+#include "diff.hpp"  // for File, Line, Hunk, Parse, Line::Add, Line::Delete, Line::Keep
+#include "environment.h"                       // for project_version
+#include "exec.hpp"                            // for exec
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"  // for Renderer, Button, Horizontal, CatchEvent, Checkbox, Menu, Vertical
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/event.hpp"               // for Event
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/dom/elements.hpp"  // for text, operator|, vbox, separator, Element, Elements, filler, bgcolor, size, window, xflex, color, hbox, dim, EQUAL, WIDTH, xflex_grow, xflex_shrink, yflex
+#include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
+#include "ftxui/screen/string.hpp"  // for to_wstring
+#include "scroller.hpp"             // for Scroller
 
 using namespace ftxui;
 
@@ -22,18 +27,18 @@ Element RenderSplit(const Hunk& hunk) {
   Elements right_lines;
   int left_line_number = hunk.left_start;
   int right_line_number = hunk.right_start;
-  auto stabilize = [&]{
-    while(left_lines.size() < right_lines.size()) {
+  auto stabilize = [&] {
+    while (left_lines.size() < right_lines.size()) {
       left_lines.push_back(text(L""));
       left_line_numbers.push_back(text(L"~") | dim);
     }
-    while(left_lines.size() > right_lines.size()) {
+    while (left_lines.size() > right_lines.size()) {
       right_lines.push_back(text(L""));
       right_line_numbers.push_back(text(L"~") | dim);
     }
   };
-  for(const Line& line : hunk.lines) {
-    switch(line.type) {
+  for (const Line& line : hunk.lines) {
+    switch (line.type) {
       case Line::Keep:
         stabilize();
         left_line_numbers.push_back(text(to_wstring(left_line_number++)));
@@ -75,8 +80,8 @@ Element RenderJoin(const Hunk& hunk) {
   Elements lines;
   int left_line_number = hunk.left_start;
   int right_line_number = hunk.right_start;
-  for(const Line& line : hunk.lines) {
-    switch(line.type) {
+  for (const Line& line : hunk.lines) {
+    switch (line.type) {
       case Line::Keep:
         left_line_numbers.push_back(text(to_wstring(left_line_number++)));
         right_line_numbers.push_back(text(to_wstring(right_line_number++)));
@@ -86,16 +91,14 @@ Element RenderJoin(const Hunk& hunk) {
       case Line::Delete:
         left_line_numbers.push_back(text(to_wstring(left_line_number++)));
         right_line_numbers.push_back(text(L"~") | dim);
-        lines.push_back(text(line.content) |
-                             color(Color::RGB(255, 200, 200)) |
-                             bgcolor(Color::RGB(128, 0, 0)));
+        lines.push_back(text(line.content) | color(Color::RGB(255, 200, 200)) |
+                        bgcolor(Color::RGB(128, 0, 0)));
         break;
       case Line::Add:
         left_line_numbers.push_back(text(L"~") | dim);
         right_line_numbers.push_back(text(to_wstring(right_line_number++)));
-        lines.push_back(text(line.content) |
-                              color(Color::RGB(200, 255, 200)) |
-                              bgcolor(Color::RGB(0, 128, 0)));
+        lines.push_back(text(line.content) | color(Color::RGB(200, 255, 200)) |
+                        bgcolor(Color::RGB(0, 128, 0)));
         break;
     }
   }
@@ -124,7 +127,6 @@ Element Render(const File& file, bool split) {
   return vbox(std::move(hunks));
 }
 
-
 int diff(int argc, const char** argv) {
   using namespace ftxui;
 
@@ -142,7 +144,8 @@ int diff(int argc, const char** argv) {
   auto refresh_data = [&] {
     files.clear();
     file_menu_entries.clear();
-    std::string command = "git diff -U" + std::to_string(hunk_size) + " " + args;
+    std::string command =
+        "git diff -U" + std::to_string(hunk_size) + " " + args;
     std::string diff = exec(command.c_str());
     files = Parse(diff);
     for (const auto& file : files)
@@ -205,15 +208,16 @@ int diff(int argc, const char** argv) {
 
   auto option_renderer = Renderer(options, [&] {
     return hbox({
-        text(L"[git tui diff]"),
-        filler(),
-        split_checkbox->Render(),
-        text(L"   Context:"),
-        button_decrease_hunk->Render(),
-        text(to_wstring(hunk_size)),
-        button_increase_hunk->Render(),
-        filler(),
-    }) | bgcolor(Color::White) | color(Color::Black);
+               text(L"[git tui diff]"),
+               filler(),
+               split_checkbox->Render(),
+               text(L"   Context:"),
+               button_decrease_hunk->Render(),
+               text(to_wstring(hunk_size)),
+               button_increase_hunk->Render(),
+               filler(),
+           }) |
+           bgcolor(Color::White) | color(Color::Black);
   });
 
   container = Container::Vertical({
@@ -221,7 +225,7 @@ int diff(int argc, const char** argv) {
       container,
   });
 
-  container = CatchEvent(container, [&] (Event event) {
+  container = CatchEvent(container, [&](Event event) {
     if (event == Event::Character('s')) {
       split = !split;
       return true;
@@ -289,3 +293,7 @@ int main(int argc, const char** argv) {
 
   return help(argc, argv);
 }
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
