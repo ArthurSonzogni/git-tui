@@ -146,7 +146,7 @@ int diff(int argc, const char** argv) {
     std::string diff = exec(command.c_str());
     files = Parse(diff);
     for (const auto& file : files)
-      file_menu_entries.push_back(file.right_file);
+      file_menu_entries.push_back(file.right_file.substr(3));
   };
   refresh_data();
 
@@ -155,15 +155,17 @@ int diff(int argc, const char** argv) {
     return EXIT_SUCCESS;
   }
 
-  auto button_increase_hunk = Button("[+1]", [&] {
-      hunk_size++;
-      refresh_data();
-  }, false);
-  auto button_decrease_hunk = Button("[-1]", [&] {
-      if (hunk_size != 0)
-        hunk_size--;
-      refresh_data();
-  }, false);
+  auto increase_hunk = [&] {
+    hunk_size++;
+    refresh_data();
+  };
+  auto decrease_hunk = [&] {
+    if (hunk_size != 0)
+      hunk_size--;
+    refresh_data();
+  };
+  auto button_increase_hunk = Button("[+1]", increase_hunk, false);
+  auto button_decrease_hunk = Button("[-1]", decrease_hunk, false);
 
   // File menu.
   int file_menu_selected = 0;
@@ -183,18 +185,14 @@ int diff(int argc, const char** argv) {
   container = Renderer(container, [&] {
     const File& file = files[file_menu_selected];
     return hbox({
-               window(text(L" Files "), file_menu->Render()) |
-                   size(WIDTH, EQUAL, 30) | notflex,
+               window(text(L" Files "), file_menu->Render()) | xflex_grow,
                vbox({
-                 window(text(L" Difference "), 
-                   vbox({
-                       text(file.left_file + L" -> " + file.right_file),
-                       separator(),
-                       scroller->Render()
-                   })
-                 ),
-                 filler(),
-               }) | xflex,
+                   window(
+                       text(L" Difference "),
+                       vbox({text(file.left_file + L" -> " + file.right_file),
+                             separator(), scroller->Render()})),
+                   filler(),
+               }) | xflex_shrink,
            }) |
            bgcolor(Color::RGB(30, 30, 30)) | yflex;
   });
@@ -221,6 +219,25 @@ int diff(int argc, const char** argv) {
   container = Container::Vertical({
       option_renderer,
       container,
+  });
+
+  container = CatchEvent(container, [&] (Event event) {
+    if (event == Event::Character('s')) {
+      split = !split;
+      return true;
+    }
+
+    if (event == Event::Character('-')) {
+      decrease_hunk();
+      return true;
+    }
+
+    if (event == Event::Character('+')) {
+      increase_hunk();
+      return true;
+    }
+
+    return false;
   });
 
   file_menu->TakeFocus();
