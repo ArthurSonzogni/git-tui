@@ -32,7 +32,7 @@
 
 # Demo
 
-### git diff-tui:
+### gittui diff
 ![Demo](./demo.gif)
 
 # Install
