@@ -7,10 +7,10 @@
 #include <iterator>  // for istreambuf_iterator, operator!=
 #include <memory>  // for allocator_traits<>::value_type, shared_ptr, __shared_ptr_access
 #include <regex>  // for regex_match, match_results, match_results<>::_Base_type, sub_match, regex, smatch
+#include <sstream>  // IWYU pragma: keep
 #include <string>  // for wstring, operator+, allocator, basic_string, char_traits, string, stoi, getline, to_string
 #include <utility>  // for move
 #include <vector>   // for vector
-
 #include "ftxui/component/component.hpp"  // for Renderer, Button, Horizontal, CatchEvent, Checkbox, Menu, Vertical
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
 #include "ftxui/component/event.hpp"               // for Event
