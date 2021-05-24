@@ -1,7 +1,7 @@
 #ifndef GIT_TUI_LOG_HPP
 #define GIT_TUI_LOG_HPP
 
-namespace log {
+namespace gittui::log {
 int main(int argc, const char** argv);
 }
 

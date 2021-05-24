@@ -1,7 +1,7 @@
 #ifndef GIT_TUI_VERSION_HPP
 #define GIT_TUI_VERSION_HPP
 
-namespace version {
+namespace gittui::version {
 int main(int argc, const char** argv);
 }
 

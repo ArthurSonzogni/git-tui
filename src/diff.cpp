@@ -22,7 +22,7 @@
 
 using namespace ftxui;
 
-namespace diff {
+namespace gittui::diff {
 
 std::vector<File> Parse(std::string input) {
   std::stringstream ss(input);

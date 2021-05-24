@@ -5,14 +5,14 @@
 
 #include "environment.h"  // for project_version
 
-namespace version {
+namespace gittui::version {
 int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
   std::cout << project_version << std::endl;
   return EXIT_SUCCESS;
 }
-}  // namespace version
+}  // namespace gittui::version
 
 // Copyright 2021 Arthur Sonzogni. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in

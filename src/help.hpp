@@ -1,7 +1,7 @@
 #ifndef GIT_TUI_HELP_HPP
 #define GIT_TUI_HELP_HPP
 
-namespace help {
+namespace gittui::help {
 int main(int argc, const char** argv);
 }
 

@@ -7,7 +7,7 @@
 
 #include "ftxui/screen/box.hpp"  // for ftxui
 
-namespace diff {
+namespace gittui::diff {
 using namespace ftxui;
 
 struct Line {
@@ -38,7 +38,7 @@ Element RenderJoin(const Hunk& hunk);
 Element Render(const File& file, bool split);
 int main(int argc, const char** argv);
 
-}  // namespace diff
+}  // namespace gittui::diff
 
 #endif /* end of include guard: GIT_DIFF_TUI_DIFF_HPP */
 
