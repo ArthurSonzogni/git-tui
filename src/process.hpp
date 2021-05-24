@@ -90,7 +90,8 @@ class pipe_t {
   pipe_t() {
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock{mutex};
-    ::pipe(&pipe_[0]);
+    int pipe_result = ::pipe(&pipe_[0]);
+    (void)pipe_result;
 
     auto flags = ::fcntl(pipe_[0], F_GETFD, 0);
     ::fcntl(pipe_[0], F_SETFD, flags | FD_CLOEXEC);

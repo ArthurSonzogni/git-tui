@@ -70,7 +70,6 @@ else()
     PRIVATE "-pedantic"
     PRIVATE "-Werror"
     PRIVATE "-Wdeprecated"
-    PRIVATE "-Wshadow"
     )
 endif()
 
