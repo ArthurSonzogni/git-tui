@@ -99,7 +99,7 @@ Commit* GetCommit(std::wstring hash) {
     }
   }
   return commit;
-};
+}
 
 int main(int argc, const char** argv) {
   (void)argc;

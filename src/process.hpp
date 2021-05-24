@@ -32,10 +32,6 @@
 #include <system_error>
 #include <vector>
 
-#ifndef PROCXX_HAS_PIPE2
-#define PROCXX_HAS_PIPE2 1
-#endif
-
 namespace procxx {
 
 /**
@@ -92,11 +88,6 @@ class pipe_t {
    * Constructs a new pipe.
    */
   pipe_t() {
-#if PROCXX_HAS_PIPE2
-    const auto r = ::pipe2(&pipe_[0], O_CLOEXEC);
-    if (-1 == r)
-      throw exception("pipe2 failed: " + std::system_category().message(errno));
-#else
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock{mutex};
     ::pipe(&pipe_[0]);
@@ -106,7 +97,6 @@ class pipe_t {
 
     flags = ::fcntl(pipe_[1], F_GETFD, 0);
     ::fcntl(pipe_[1], F_SETFD, flags | FD_CLOEXEC);
-#endif
   }
 
   /**
