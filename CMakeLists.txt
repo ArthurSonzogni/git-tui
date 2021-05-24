@@ -41,6 +41,10 @@ add_executable(git-tui
   src/diff.hpp
   src/log.cpp
   src/log.hpp
+  src/help.cpp
+  src/help.hpp
+  src/version.cpp
+  src/version.hpp
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp

@@ -1,33 +1,9 @@
-#include <stdlib.h>  // for EXIT_SUCCESS
-#include <iostream>  // for operator<<, endl, basic_ostream, cout, ostream
-#include <string>    // for operator==, allocator, basic_string, string
+#include <string>  // for operator==, allocator, basic_string, string
 
-#include "diff.hpp"                            // for diff
-#include "log.hpp"                            // for diff
-#include "environment.h"                       // for project_version
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-
-using namespace ftxui;
-
-namespace help {
-int main(int argc, const char** argv) {
-  (void)argc;
-  (void)argv;
-  std::cout << "Usage: " << std::endl;
-  std::cout << " - git tui diff [args]*" << std::endl;
-  std::cout << "" << std::endl;
-  return EXIT_SUCCESS;
-}
-}  // namespace help
-
-namespace version {
-int main(int argc, const char** argv) {
-  (void)argc;
-  (void)argv;
-  std::cout << project_version << std::endl;
-  return EXIT_SUCCESS;
-}
-}  // namespace version
+#include "diff.hpp"     // for main
+#include "help.hpp"     // for main
+#include "log.hpp"      // for main
+#include "version.hpp"  // for main
 
 int main(int argc, const char** argv) {
   if (argc == 0)

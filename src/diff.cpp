@@ -3,22 +3,22 @@
 #include <assert.h>                 // for assert
 #include <stdlib.h>                 // for EXIT_SUCCESS
 #include <ftxui/screen/string.hpp>  // for to_wstring
-#include <iostream>  // for operator<<, stringstream, endl, basic_ios, basic_istream, basic_ostream, cout, ostream
+#include <iostream>  // for basic_istream, operator<<, stringstream, endl, basic_ios, basic_ostream, cout, ostream
+#include <iterator>  // for istreambuf_iterator, operator!=
 #include <memory>  // for allocator_traits<>::value_type, shared_ptr, __shared_ptr_access
 #include <regex>  // for regex_match, match_results, match_results<>::_Base_type, sub_match, regex, smatch
-#include <string>  // for wstring, allocator, operator+, basic_string, char_traits, string, stoi, getline, to_string
+#include <string>  // for wstring, operator+, allocator, basic_string, char_traits, string, stoi, getline, to_string
 #include <utility>  // for move
 #include <vector>   // for vector
 
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
 #include "ftxui/component/component.hpp"  // for Renderer, Button, Horizontal, CatchEvent, Checkbox, Menu, Vertical
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
 #include "ftxui/component/event.hpp"               // for Event
 #include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
 #include "ftxui/dom/elements.hpp"  // for text, operator|, vbox, separator, Element, Elements, filler, bgcolor, size, window, xflex, color, hbox, dim, EQUAL, WIDTH, xflex_grow, xflex_shrink, yflex
 #include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
-#include "process.hpp"
-#include "scroller.hpp"  // for Scroller
+#include "process.hpp"             // for process
+#include "scroller.hpp"            // for Scroller
 
 using namespace ftxui;
 
@@ -226,7 +226,7 @@ int main(int argc, const char** argv) {
     procxx::process git("git");
     git.add_argument("diff");
     git.add_argument("-U" + std::to_string(hunk_size));
-    for(int i = 0; i<argc; ++i)
+    for (int i = 0; i < argc; ++i)
       git.add_argument(argv[i]);
     git.exec();
 

@@ -1,11 +1,11 @@
-#ifndef GIT_TUI_LOG_HPP
-#define GIT_TUI_LOG_HPP
+#ifndef GIT_TUI_VERSION_HPP
+#define GIT_TUI_VERSION_HPP
 
-namespace log {
+namespace version {
 int main(int argc, const char** argv);
 }
 
-#endif /* end of include guard: GIT_TUI_LOG_HPP */
+#endif /* end of include guard: GIT_TUI_VERSION_HPP */
 
 // Copyright 2021 Arthur Sonzogni. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in

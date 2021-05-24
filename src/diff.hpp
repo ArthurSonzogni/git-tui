@@ -1,9 +1,11 @@
 #ifndef GIT_DIFF_TUI_DIFF_HPP
 #define GIT_DIFF_TUI_DIFF_HPP
 
-#include <string>
-#include <vector>
-#include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/elements.hpp>  // for Element
+#include <string>                  // for wstring, string
+#include <vector>                  // for vector
+
+#include "ftxui/screen/box.hpp"  // for ftxui
 
 namespace diff {
 using namespace ftxui;

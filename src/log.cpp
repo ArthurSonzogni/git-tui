@@ -1,16 +1,29 @@
 #include "log.hpp"
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/menu.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/string.hpp>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <queue>
-#include "diff.hpp"
-#include "process.hpp"
-#include "scroller.hpp"
+
+#include <stdlib.h>   // for EXIT_SUCCESS
+#include <algorithm>  // for copy
+#include <ftxui/component/component.hpp>  // for Horizontal, Renderer, Button, Menu, CatchEvent, Checkbox, Vertical
+#include <ftxui/component/menu.hpp>                // for MenuBase
+#include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive
+#include <ftxui/dom/elements.hpp>  // for operator|, text, separator, Element, size, xflex, vbox, color, yframe, hbox, bold, EQUAL, WIDTH, filler, Elements, nothing, yflex, bgcolor
+#include <ftxui/screen/string.hpp>  // for to_wstring, to_string
+#include <functional>               // for function
+#include <iostream>                 // for basic_istream, char_traits
+#include <iterator>                 // for istreambuf_iterator, operator!=
+#include <map>                      // for map, map<>::mapped_type
+#include <memory>  // for allocator, shared_ptr, __shared_ptr_access, unique_ptr, make_unique
+#include <queue>  // for queue
+#include <string>  // for wstring, basic_string, string, getline, operator+, operator<, to_string
+#include <utility>  // for move
+#include <vector>   // for vector
+
+#include "diff.hpp"                            // for File, Parse, Render
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component_base.hpp"  // for ComponentBase
+#include "ftxui/component/event.hpp"           // for Event
+#include "ftxui/screen/color.hpp"  // for Color, Color::Green, Color::Red, Color::Black, Color::White
+#include "process.hpp"   // for process
+#include "scroller.hpp"  // for Scroller
 
 using namespace ftxui;
 namespace log {
@@ -178,7 +191,6 @@ int main(int argc, const char** argv) {
       }));
     }
 
-
     elements.push_back(hbox({
         text(L"     hash:") | bold | color(Color::Green),
         text(commit->hash) | xflex,
@@ -265,7 +277,8 @@ int main(int argc, const char** argv) {
                 separator(),
                 scroller->Render() | xflex,
             }) | xflex,
-        }) | yflex | nothing,
+        }) | yflex |
+            nothing,
     });
   });
 
@@ -298,3 +311,7 @@ int main(int argc, const char** argv) {
 }
 
 }  // namespace log
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
