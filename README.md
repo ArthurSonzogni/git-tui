@@ -63,6 +63,9 @@ Available commands:
 ```bash
 git tui diff
 ```
+```bash
+git tui log 
+```
 
 More to be added...
 
