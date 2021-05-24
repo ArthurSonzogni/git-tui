@@ -1,258 +1,16 @@
 #include <stdlib.h>  // for EXIT_SUCCESS
 #include <iostream>  // for operator<<, endl, basic_ostream, cout, ostream
-#include <memory>    // for allocator, shared_ptr, __shared_ptr_access
-#include <string>  // for wstring, operator+, char_traits, basic_string, string, operator==, to_string
-#include <utility>  // for move
-#include <vector>   // for vector
+#include <string>    // for operator==, allocator, basic_string, string
 
-#include "diff.hpp"  // for File, Line, Hunk, Parse, Line::Add, Line::Delete, Line::Keep
+#include "diff.hpp"                            // for diff
+#include "log.hpp"                            // for diff
 #include "environment.h"                       // for project_version
-#include "exec.hpp"                            // for exec
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component.hpp"  // for Renderer, Button, Horizontal, CatchEvent, Checkbox, Menu, Vertical
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-#include "ftxui/component/event.hpp"               // for Event
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "ftxui/dom/elements.hpp"  // for text, operator|, vbox, separator, Element, Elements, filler, bgcolor, size, window, xflex, color, hbox, dim, EQUAL, WIDTH, xflex_grow, xflex_shrink, yflex
-#include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
-#include "ftxui/screen/string.hpp"  // for to_wstring
-#include "scroller.hpp"             // for Scroller
 
 using namespace ftxui;
 
-Element RenderSplit(const Hunk& hunk) {
-  Elements left_line_numbers;
-  Elements left_lines;
-  Elements right_line_numbers;
-  Elements right_lines;
-  int left_line_number = hunk.left_start;
-  int right_line_number = hunk.right_start;
-  auto stabilize = [&] {
-    while (left_lines.size() < right_lines.size()) {
-      left_lines.push_back(text(L""));
-      left_line_numbers.push_back(text(L"~") | dim);
-    }
-    while (left_lines.size() > right_lines.size()) {
-      right_lines.push_back(text(L""));
-      right_line_numbers.push_back(text(L"~") | dim);
-    }
-  };
-  for (const Line& line : hunk.lines) {
-    switch (line.type) {
-      case Line::Keep:
-        stabilize();
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
-        left_lines.push_back(text(line.content));
-        right_lines.push_back(text(line.content));
-        break;
-
-      case Line::Delete:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        left_lines.push_back(text(line.content) |
-                             color(Color::RGB(255, 200, 200)) |
-                             bgcolor(Color::RGB(128, 0, 0)));
-        break;
-      case Line::Add:
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
-        right_lines.push_back(text(line.content) |
-                              color(Color::RGB(200, 255, 200)) |
-                              bgcolor(Color::RGB(0, 128, 0)));
-        break;
-    }
-  }
-  stabilize();
-  return hbox({
-             vbox(std::move(left_line_numbers)),
-             separator(),
-             vbox(std::move(left_lines)) | size(WIDTH, EQUAL, 800) | xflex,
-             separator(),
-             vbox(std::move(right_line_numbers)),
-             separator(),
-             vbox(std::move(right_lines)) | size(WIDTH, EQUAL, 800) | xflex,
-         }) |
-         xflex;
-}
-
-Element RenderJoin(const Hunk& hunk) {
-  Elements left_line_numbers;
-  Elements right_line_numbers;
-  Elements lines;
-  int left_line_number = hunk.left_start;
-  int right_line_number = hunk.right_start;
-  for (const Line& line : hunk.lines) {
-    switch (line.type) {
-      case Line::Keep:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
-        lines.push_back(text(line.content));
-        break;
-
-      case Line::Delete:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        right_line_numbers.push_back(text(L"~") | dim);
-        lines.push_back(text(line.content) | color(Color::RGB(255, 200, 200)) |
-                        bgcolor(Color::RGB(128, 0, 0)));
-        break;
-      case Line::Add:
-        left_line_numbers.push_back(text(L"~") | dim);
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
-        lines.push_back(text(line.content) | color(Color::RGB(200, 255, 200)) |
-                        bgcolor(Color::RGB(0, 128, 0)));
-        break;
-    }
-  }
-  return hbox({
-             vbox(std::move(left_line_numbers)),
-             separator(),
-             vbox(std::move(right_line_numbers)),
-             separator(),
-             vbox(std::move(lines)) | size(WIDTH, EQUAL, 800) | xflex,
-         }) |
-         xflex;
-}
-
-Element Render(const File& file, bool split) {
-  Elements hunks;
-  bool is_first = true;
-  for (const Hunk& hunk : file.hunks) {
-    if (!is_first)
-      hunks.push_back(separator());
-    is_first = false;
-    if (split)
-      hunks.push_back(RenderSplit(hunk));
-    else
-      hunks.push_back(RenderJoin(hunk));
-  }
-  return vbox(std::move(hunks));
-}
-
-int diff(int argc, const char** argv) {
-  using namespace ftxui;
-
-  std::string args;
-  for (int i = 0; i < argc; ++i) {
-    args += argv[i];
-    args += " ";
-  }
-
-  int hunk_size = 3;
-
-  std::vector<File> files;
-  std::vector<std::wstring> file_menu_entries;
-
-  auto refresh_data = [&] {
-    files.clear();
-    file_menu_entries.clear();
-    std::string command =
-        "git diff -U" + std::to_string(hunk_size) + " " + args;
-    std::string diff = exec(command.c_str());
-    files = Parse(diff);
-    for (const auto& file : files)
-      file_menu_entries.push_back(file.right_file.substr(3));
-  };
-  refresh_data();
-
-  if (files.size() == 0) {
-    std::cout << "No difference..." << std::endl;
-    return EXIT_SUCCESS;
-  }
-
-  auto increase_hunk = [&] {
-    hunk_size++;
-    refresh_data();
-  };
-  auto decrease_hunk = [&] {
-    if (hunk_size != 0)
-      hunk_size--;
-    refresh_data();
-  };
-  auto button_increase_hunk = Button("[+1]", increase_hunk, false);
-  auto button_decrease_hunk = Button("[-1]", decrease_hunk, false);
-
-  // File menu.
-  int file_menu_selected = 0;
-  auto file_menu = Menu(&file_menu_entries, &file_menu_selected);
-
-  bool split = true;
-  auto split_checkbox = Checkbox("[S]plit", &split);
-
-  auto scroller = Scroller(
-      Renderer([&] { return Render(files[file_menu_selected], split); }));
-
-  auto container = Container::Horizontal({
-      file_menu,
-      scroller,
-  });
-
-  container = Renderer(container, [&] {
-    const File& file = files[file_menu_selected];
-    return hbox({
-               window(text(L" Files "), file_menu->Render()) | xflex_grow,
-               vbox({
-                   window(
-                       text(L" Difference "),
-                       vbox({text(file.left_file + L" -> " + file.right_file),
-                             separator(), scroller->Render()})),
-                   filler(),
-               }) | xflex_shrink,
-           }) |
-           bgcolor(Color::RGB(30, 30, 30)) | yflex;
-  });
-
-  auto options = Container::Horizontal({
-      split_checkbox,
-      button_decrease_hunk,
-      button_increase_hunk,
-  });
-
-  auto option_renderer = Renderer(options, [&] {
-    return hbox({
-               text(L"[git tui diff]"),
-               filler(),
-               split_checkbox->Render(),
-               text(L"   Context:"),
-               button_decrease_hunk->Render(),
-               text(to_wstring(hunk_size)),
-               button_increase_hunk->Render(),
-               filler(),
-           }) |
-           bgcolor(Color::White) | color(Color::Black);
-  });
-
-  container = Container::Vertical({
-      option_renderer,
-      container,
-  });
-
-  container = CatchEvent(container, [&](Event event) {
-    if (event == Event::Character('s')) {
-      split = !split;
-      return true;
-    }
-
-    if (event == Event::Character('-')) {
-      decrease_hunk();
-      return true;
-    }
-
-    if (event == Event::Character('+')) {
-      increase_hunk();
-      return true;
-    }
-
-    return false;
-  });
-
-  file_menu->TakeFocus();
-
-  auto screen = ScreenInteractive::Fullscreen();
-  screen.Loop(container);
-
-  return EXIT_SUCCESS;
-}
-
-int help(int argc, const char** argv) {
+namespace help {
+int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
   std::cout << "Usage: " << std::endl;
@@ -260,24 +18,27 @@ int help(int argc, const char** argv) {
   std::cout << "" << std::endl;
   return EXIT_SUCCESS;
 }
+}  // namespace help
 
-int version(int argc, const char** argv) {
+namespace version {
+int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
   std::cout << project_version << std::endl;
   return EXIT_SUCCESS;
 }
+}  // namespace version
 
 int main(int argc, const char** argv) {
   if (argc == 0)
-    return help(argc, argv);
+    return help::main(argc, argv);
 
   // Eat the first argument.
   argc--;
   argv++;
 
   if (argc == 0)
-    return help(argc, argv);
+    return help::main(argc, argv);
 
   std::string command = argv[0];
 
@@ -286,12 +47,15 @@ int main(int argc, const char** argv) {
   argv++;
 
   if (command == "diff")
-    return diff(argc, argv);
+    return diff::main(argc, argv);
+
+  if (command == "log")
+    return log::main(argc, argv);
 
   if (command == "version")
-    return version(argc, argv);
+    return version::main(argc, argv);
 
-  return help(argc, argv);
+  return help::main(argc, argv);
 }
 
 // Copyright 2021 Arthur Sonzogni. All rights reserved.

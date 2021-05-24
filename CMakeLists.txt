@@ -14,7 +14,6 @@ if(NOT ftxui_POPULATED)
   FetchContent_Populate(ftxui)
   add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
-
 # ------------------------------------------------------------------------------
 
 set(git_tag 0)
@@ -40,11 +39,12 @@ project(git-tui
 add_executable(git-tui
   src/diff.cpp
   src/diff.hpp
+  src/log.cpp
+  src/log.hpp
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp
-  src/exec.cpp
-  src/exec.hpp
+  src/process.hpp
   )
 
 target_include_directories(git-tui

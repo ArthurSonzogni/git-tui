@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <ftxui/dom/elements.hpp>
+
+namespace diff {
+using namespace ftxui;
 
 struct Line {
   enum Type {
@@ -27,6 +31,12 @@ struct File {
 };
 
 std::vector<File> Parse(std::string input);
+Element RenderSplit(const Hunk& hunk);
+Element RenderJoin(const Hunk& hunk);
+Element Render(const File& file, bool split);
+int main(int argc, const char** argv);
+
+}  // namespace diff
 
 #endif /* end of include guard: GIT_DIFF_TUI_DIFF_HPP */
 

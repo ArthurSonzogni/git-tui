@@ -3,7 +3,7 @@ cd "$(dirname "$0")"
 cd ..
 
 # Add the license file.
-files=$(find ./src ./include ./examples  -name "*.hpp" -o -name "*.cpp")
+files=$(find ./src -name "*.hpp" -o -name "*.cpp")
 for file in $files
 do
   if ! grep -q Copyright $file
