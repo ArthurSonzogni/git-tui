@@ -273,7 +273,8 @@ int main(int argc, const char** argv) {
   container = Renderer(container, [&] {
     const File& file = files[file_menu_selected];
     return hbox({
-               window(text(L" Files "), file_menu->Render()) | xflex_grow,
+               window(text(L" Files "), file_menu->Render()) |
+                   size(WIDTH, LESS_THAN, 30),
                vbox({
                    window(
                        text(L" Difference "),

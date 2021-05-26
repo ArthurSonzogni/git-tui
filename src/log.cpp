@@ -102,6 +102,8 @@ Commit* GetCommit(std::wstring hash) {
 }
 
 int main(int argc, const char** argv) {
+  auto screen = ScreenInteractive::Fullscreen();
+
   (void)argc;
   (void)argv;
   std::vector<Commit*> commits;
@@ -165,18 +167,6 @@ int main(int argc, const char** argv) {
     Commit* commit = commits[menu_commit_index];
     Elements elements;
 
-    elements.push_back(hbox({
-        text(L"    title:") | bold | color(Color::Red),
-        text(commit->title) | xflex,
-    }));
-
-    if (commit->body.size() != 0) {
-      elements.push_back(separator());
-      for (auto& it : commit->body)
-        elements.push_back(text(it));
-      elements.push_back(separator());
-    }
-
     for (const auto& committer : commit->committers) {
       elements.push_back(hbox({
           text(L"committer:") | bold | color(Color::Green),
@@ -208,6 +198,17 @@ int main(int argc, const char** argv) {
         text(commit->tree) | xflex,
     }));
 
+    elements.push_back(hbox({
+        text(L"    title:") | bold | color(Color::Red),
+        text(commit->title) | xflex,
+    }));
+
+    elements.push_back(separator());
+    if (commit->body.size() != 0) {
+      for (auto& it : commit->body)
+        elements.push_back(text(it));
+    }
+
     auto content = vbox(std::move(elements));
     return content;
   });
@@ -226,11 +227,13 @@ int main(int argc, const char** argv) {
   auto split_checkbox = Checkbox("[S]plit", &split);
   auto button_increase_hunk = Button("[+1]", increase_hunk, false);
   auto button_decrease_hunk = Button("[-1]", decrease_hunk, false);
+  auto button_quit = Button("[Q]uit", screen.ExitLoopClosure(), false);
 
   auto options = Container::Horizontal({
       split_checkbox,
       button_decrease_hunk,
       button_increase_hunk,
+      button_quit,
   });
 
   auto option_renderer = Renderer(options, [&] {
@@ -243,6 +246,7 @@ int main(int argc, const char** argv) {
                text(to_wstring(hunk_size)),
                button_increase_hunk->Render(),
                filler(),
+               button_quit->Render(),
            }) |
            bgcolor(Color::White) | color(Color::Black);
   });
@@ -300,12 +304,16 @@ int main(int argc, const char** argv) {
       return true;
     }
 
+    if (event == Event::Character('q') || event == Event::Escape) {
+      screen.ExitLoopClosure()();
+      return true;
+    }
+
     return false;
   });
 
   menu_commit->TakeFocus();
 
-  auto screen = ScreenInteractive::Fullscreen();
   screen.Loop(renderer);
   return EXIT_SUCCESS;
 }
