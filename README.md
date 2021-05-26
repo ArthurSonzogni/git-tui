@@ -60,12 +60,18 @@ sudo make install -j;
 Replace `git` by `git tui` and use the usual commands and arguments.
 
 Available commands:
+
+## `git tui diff
 ```bash
 git tui diff
 ```
+[![asciicast](https://asciinema.org/a/kbiBKpFLfxOWcRdSKez9h1Wvj.svg)](https://asciinema.org/a/kbiBKpFLfxOWcRdSKez9h1Wvj)
+
+## `git tui log`
 ```bash
 git tui log 
 ```
+[![asciicast](https://asciinema.org/a/vUk8EQRsmV95fQ9W5rhMMOHLG.svg)](https://asciinema.org/a/vUk8EQRsmV95fQ9W5rhMMOHLG)
 
 More to be added...
 
