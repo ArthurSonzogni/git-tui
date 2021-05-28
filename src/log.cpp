@@ -154,6 +154,7 @@ int main(int argc, const char** argv) {
       menu_files_entries.push_back(file.right_file);
   };
   refresh_files();
+
   auto menu_files = Menu(&menu_files_entries, &menu_files_index);
   MenuBase::From(menu_commit)->on_change = [&] {
     refresh_files();
@@ -251,42 +252,44 @@ int main(int argc, const char** argv) {
            bgcolor(Color::White) | color(Color::Black);
   });
 
-  auto container = Container::Vertical({
-      options,
-      Container::Horizontal({
-          menu_commit,
-          menu_files,
-          scroller,
-      }),
-  });
-
-  auto renderer = Renderer(container, [&] {
+  menu_files = Renderer(menu_files, [menu_files] {
     return vbox({
-        option_renderer->Render(),
-        hbox({
-            vbox({
-                text(L"Commit"),
-                separator(),
-                menu_commit->Render() | size(WIDTH, EQUAL, 25) | yframe,
-            }),
-            separator(),
-            vbox({
-                text(L"Files"),
-                separator(),
-                menu_files->Render() | size(WIDTH, EQUAL, 25) | yframe,
-            }),
-            separator(),
-            vbox({
-                text(L"Content"),
-                separator(),
-                scroller->Render() | xflex,
-            }) | xflex,
-        }) | yflex |
-            nothing,
+        text(L"Commit"),
+        separator(),
+        menu_files->Render() | size(WIDTH, EQUAL, 25) | yframe,
     });
   });
 
-  renderer = CatchEvent(renderer, [&](Event event) {
+  menu_commit = Renderer(menu_commit, [menu_commit] {
+    return vbox({
+        text(L"Files"),
+        separator(),
+        menu_commit->Render() | size(WIDTH, EQUAL, 25) | yframe,
+    });
+  });
+
+  scroller = Renderer(scroller, [scroller] {
+    return vbox({
+        text(L"Content"),
+        separator(),
+        scroller->Render() | flex,
+    });
+  });
+
+  int menu_commit_width = 25;
+  int menu_files_width = 25;
+
+  auto container = scroller;
+  container = ResizableSplitLeft(menu_files, container, &menu_files_width);
+  container = ResizableSplitLeft(menu_commit, container, &menu_commit_width);
+  container =
+      Renderer(container, [container] { return container->Render() | flex; });
+  container = Container::Vertical({
+      option_renderer,
+      container,
+  });
+
+  container = CatchEvent(container, [&](Event event) {
     refresh_commit_list();
 
     if (event == Event::Character('s')) {
@@ -314,7 +317,7 @@ int main(int argc, const char** argv) {
 
   menu_commit->TakeFocus();
 
-  screen.Loop(renderer);
+  screen.Loop(container);
   return EXIT_SUCCESS;
 }
 

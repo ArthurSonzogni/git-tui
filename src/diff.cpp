@@ -265,25 +265,32 @@ int main(int argc, const char** argv) {
   auto scroller = Scroller(
       Renderer([&] { return Render(files[file_menu_selected], split); }));
 
-  auto container = Container::Horizontal({
-      file_menu,
-      scroller,
+  auto file_menu_renderer = Renderer(file_menu, [&] {
+    return vbox({
+        text(L" Files "),
+        separator(),
+        file_menu->Render(),
+    });
   });
 
-  container = Renderer(container, [&] {
+  auto file_renderer = Renderer(scroller, [&, file_menu] {
     const File& file = files[file_menu_selected];
-    return hbox({
-               window(text(L" Files "), file_menu->Render()) |
-                   size(WIDTH, LESS_THAN, 30),
-               vbox({
-                   window(
-                       text(L" Difference "),
-                       vbox({text(file.left_file + L" -> " + file.right_file),
-                             separator(), scroller->Render()})),
-                   filler(),
-               }) | xflex_shrink,
+    return vbox({
+               text(L" Difference "),
+               separator(),
+               text(file.left_file + L" -> " + file.right_file),
+               separator(),
+               scroller->Render(),
            }) |
-           bgcolor(Color::RGB(30, 30, 30)) | yflex;
+           flex;
+  });
+
+  int file_menu_width = 30;
+  auto layout =
+      ResizableSplitLeft(file_menu_renderer, file_renderer, &file_menu_width);
+
+  auto layout_renderer = Renderer(layout, [&] {
+    return layout->Render() | bgcolor(Color::RGB(30, 30, 30)) | yflex;
   });
 
   auto options = Container::Horizontal({
@@ -306,12 +313,12 @@ int main(int argc, const char** argv) {
            bgcolor(Color::White) | color(Color::Black);
   });
 
-  container = Container::Vertical({
+  auto main_container = Container::Vertical({
       option_renderer,
-      container,
+      layout_renderer,
   });
 
-  container = CatchEvent(container, [&](Event event) {
+  auto final_container = CatchEvent(main_container, [&](Event event) {
     if (event == Event::Character('s')) {
       split = !split;
       return true;
@@ -333,12 +340,12 @@ int main(int argc, const char** argv) {
   file_menu->TakeFocus();
 
   auto screen = ScreenInteractive::Fullscreen();
-  screen.Loop(container);
+  screen.Loop(final_container);
 
   return EXIT_SUCCESS;
 }
 
-}  // namespace diff
+}  // namespace gittui::diff
 
 // Copyright 2021 Arthur Sonzogni. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in
