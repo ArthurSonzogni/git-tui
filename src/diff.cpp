@@ -252,8 +252,10 @@ int main(int argc, const char** argv) {
       hunk_size--;
     refresh_data();
   };
-  auto button_increase_hunk = Button("[+1]", increase_hunk, false);
-  auto button_decrease_hunk = Button("[-1]", decrease_hunk, false);
+  auto button_option = ButtonOption();
+  button_option.border = false;
+  auto button_increase_hunk = Button("[+1]", increase_hunk, button_option);
+  auto button_decrease_hunk = Button("[-1]", decrease_hunk, button_option);
 
   // File menu.
   int file_menu_selected = 0;

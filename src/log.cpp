@@ -3,7 +3,6 @@
 #include <stdlib.h>   // for EXIT_SUCCESS
 #include <algorithm>  // for copy
 #include <ftxui/component/component.hpp>  // for Horizontal, Renderer, Button, Menu, CatchEvent, Checkbox, Vertical
-#include <ftxui/component/menu.hpp>                // for MenuBase
 #include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive
 #include <ftxui/dom/elements.hpp>  // for operator|, text, separator, Element, size, xflex, vbox, color, yframe, hbox, bold, EQUAL, WIDTH, filler, Elements, nothing, yflex, bgcolor
 #include <ftxui/screen/string.hpp>  // for to_wstring, to_string
@@ -127,7 +126,6 @@ int main(int argc, const char** argv) {
     }
   };
   refresh_commit_list();
-  auto menu_commit = Menu(&menu_commit_entries, &menu_commit_index);
 
   int hunk_size = 3;
   bool split = true;
@@ -155,11 +153,14 @@ int main(int argc, const char** argv) {
   };
   refresh_files();
 
-  auto menu_files = Menu(&menu_files_entries, &menu_files_index);
-  MenuBase::From(menu_commit)->on_change = [&] {
+  auto menu_commit_option = MenuOption();
+  menu_commit_option.on_change = [&] {
     refresh_files();
     menu_files_index = 0;
   };
+  auto menu_commit =
+      Menu(&menu_commit_entries, &menu_commit_index, menu_commit_option);
+  auto menu_files = Menu(&menu_files_entries, &menu_files_index);
 
   auto commit_renderer = Renderer([&] {
     if (menu_files_index != 0 && menu_files_index - 1 < (int)files.size())
@@ -226,9 +227,11 @@ int main(int argc, const char** argv) {
     refresh_files();
   };
   auto split_checkbox = Checkbox("[S]plit", &split);
-  auto button_increase_hunk = Button("[+1]", increase_hunk, false);
-  auto button_decrease_hunk = Button("[-1]", decrease_hunk, false);
-  auto button_quit = Button("[Q]uit", screen.ExitLoopClosure(), false);
+  auto button_option = ButtonOption();
+  button_option.border = false;
+  auto button_increase_hunk = Button("[+1]", increase_hunk, button_option);
+  auto button_decrease_hunk = Button("[-1]", decrease_hunk, button_option);
+  auto button_quit = Button("[Q]uit", screen.ExitLoopClosure(), button_option);
 
   auto options = Container::Horizontal({
       split_checkbox,
@@ -256,7 +259,7 @@ int main(int argc, const char** argv) {
     return vbox({
         text(L"Commit"),
         separator(),
-        menu_files->Render() | yframe,
+        menu_files->Render() | vscroll_indicator | yframe | yflex,
     });
   });
 
@@ -264,7 +267,7 @@ int main(int argc, const char** argv) {
     return vbox({
         text(L"Files"),
         separator(),
-        menu_commit->Render() | yframe,
+        menu_commit->Render() | vscroll_indicator | yframe | yflex,
     });
   });
 

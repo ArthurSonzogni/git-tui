@@ -34,7 +34,7 @@ class ScrollerBase : public ComponentBase {
                    text(L"") | style | focused,
                }),
            }) |
-           yframe | yflex | reflect(box_);
+           vscroll_indicator | yframe | yflex | reflect(box_);
   }
 
   bool OnEvent(Event event) final {
