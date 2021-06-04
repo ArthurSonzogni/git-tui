@@ -256,7 +256,7 @@ int main(int argc, const char** argv) {
     return vbox({
         text(L"Commit"),
         separator(),
-        menu_files->Render() | size(WIDTH, EQUAL, 25) | yframe,
+        menu_files->Render() | yframe,
     });
   });
 
@@ -264,7 +264,7 @@ int main(int argc, const char** argv) {
     return vbox({
         text(L"Files"),
         separator(),
-        menu_commit->Render() | size(WIDTH, EQUAL, 25) | yframe,
+        menu_commit->Render() | yframe,
     });
   });
 
