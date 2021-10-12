@@ -55,6 +55,8 @@ class ScrollerBase : public ComponentBase {
     return selected_old != selected_;
   }
 
+  bool Focusable() const final { return true; }
+
   int selected_ = 0;
   int size_ = 0;
   Box box_;
