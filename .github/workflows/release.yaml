@@ -21,34 +21,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
-    name: Build
+    name: Additional OS artifacts
     needs: release
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            binary: git-tui
-          - os: macos-latest
-            binary: git-tui
-          - os: windows-latest
-            binary: git-tui.exe
+        os: 
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
       - uses: lukka/get-cmake@latest
-      - uses: lukka/run-cmake@v2
-        with:
-          cmakeListsOrSettingsJson: "CMakeListsTxtBasic"
-          cmakeBuildType: Release
-          buildDirectory: "${{ github.workspace }}/${{ matrix.os }}"
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        run: >
+          mkdir build;
+          cd build;
+          cmake ..;
+          cmake --build .  --config Release --target package;
+      - uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: "${{ github.workspace }}/${{ matrix.os }}/${{ matrix.binary }}"
-          asset_name: "${{ matrix.os }}"
-          asset_content_type: application/octet-stream
+          asset_path: build/git-tui-*
+          overwrite: true

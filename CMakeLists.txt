@@ -90,7 +90,16 @@ configure_file(
 install(TARGETS git-tui RUNTIME DESTINATION "bin")
 
 # ------------------------------------------------------------------------------
-set(CPACK_GENERATOR "DEB;External;RPM;STGZ;TBZ2;TGZ;TXZ;TZ;TZST;ZIP")
+if (UNIX AND NOT APPLE)
+  set(CPACK_GENERATOR "DEB;RPM;TGZ;ZIP")
+elseif (UNIX AND APPLE)
+  set(CPACK_GENERATOR "DragNDrop;NuGet;TGZ;ZIP")
+elseif (WIN32)
+  set(CPACK_GENERATOR "DEB;NuGet;TGZ;ZIP")
+else()
+  set(CPACK_GENERATOR "ZIP")
+endif()
+
 set(CPACK_DEBIAN_PACKAGE_DEPENDS " ")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/git-tui/")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
