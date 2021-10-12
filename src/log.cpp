@@ -12,6 +12,7 @@
 #include <map>                      // for map, map<>::mapped_type
 #include <memory>  // for allocator, shared_ptr, __shared_ptr_access, unique_ptr, make_unique
 #include <queue>  // for queue
+#include <sstream>
 #include <string>  // for wstring, basic_string, string, getline, operator+, operator<, to_string
 #include <utility>  // for move
 #include <vector>   // for vector
@@ -28,14 +29,7 @@ using namespace ftxui;
 namespace gittui::log {
 
 std::string ResolveHead() {
-  procxx::process git("git");
-  git.add_argument("rev-list");
-  git.add_argument("HEAD");
-  git.add_argument("-1");
-  git.exec();
-  std::string line;
-  std::getline(git.output(), line);
-  return line;
+  return ExecuteProcess("git rev-list HEAD -1");
 }
 
 struct Commit {
@@ -57,14 +51,12 @@ Commit* GetCommit(std::wstring hash) {
   Commit* commit = g_commit[hash].get();
   commit->hash = hash;
 
-  procxx::process git("git");
-  git.add_argument("cat-file");
-  git.add_argument("commit");
-  git.add_argument(to_string(hash));
-  git.exec();
+  std::string data = ExecuteProcess("git cat-file commit " + to_string(hash));
+  std::stringstream ss;
+  ss << data;
 
   std::string line;
-  while (std::getline(git.output(), line)) {
+  while (std::getline(ss, line)) {
     if (line.find("tree ", 0) == 0) {
       commit->tree = to_wstring(line.substr(5));
       continue;
@@ -87,7 +79,7 @@ Commit* GetCommit(std::wstring hash) {
 
     if (line.empty()) {
       int index = -1;
-      while (std::getline(git.output(), line)) {
+      while (std::getline(ss, line)) {
         ++index;
         if (index == 0)
           commit->title = to_wstring(line);
@@ -137,15 +129,11 @@ int main(int argc, const char** argv) {
     files.clear();
     menu_files_entries.clear();
 
-    procxx::process git("git");
-    git.add_argument("diff");
-    git.add_argument("-U" + std::to_string(hunk_size));
-    git.add_argument(to_string(commit->hash) + "~..." +
-                     to_string(commit->hash));
-    git.exec();
+    std::string diff =
+        ExecuteProcess("git diff -U" + std::to_string(hunk_size) + " " +  //
+                       to_string(commit->hash) + "~..." +                 //
+                       to_string(commit->hash));
 
-    std::string diff(std::istreambuf_iterator<char>(git.output()),
-                     std::istreambuf_iterator<char>());
     files = diff::Parse(diff);
     menu_files_entries.push_back(L"description");
     for (const auto& file : files)

@@ -49,6 +49,7 @@ add_executable(git-tui
   src/scroller.cpp
   src/scroller.hpp
   src/process.hpp
+  src/process.cpp
   )
 
 target_include_directories(git-tui

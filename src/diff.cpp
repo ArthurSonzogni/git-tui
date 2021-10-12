@@ -223,15 +223,11 @@ int main(int argc, const char** argv) {
     files.clear();
     file_menu_entries.clear();
 
-    procxx::process git("git");
-    git.add_argument("diff");
-    git.add_argument("-U" + std::to_string(hunk_size));
+    std::string command = "git diff -U" + std::to_string(hunk_size);
     for (int i = 0; i < argc; ++i)
-      git.add_argument(argv[i]);
-    git.exec();
+      command += std::string(" ") + argv[i];
 
-    std::string diff(std::istreambuf_iterator<char>(git.output()),
-                     std::istreambuf_iterator<char>());
+    std::string diff = ExecuteProcess(command);
     files = Parse(diff);
     for (const auto& file : files)
       file_menu_entries.push_back(file.right_file);
