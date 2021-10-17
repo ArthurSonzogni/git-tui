@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.15)
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
@@ -64,6 +64,8 @@ target_link_libraries(git-tui
   )
 
 if (MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 else()
   target_compile_options(git-tui
     PRIVATE "-Wall"
@@ -76,7 +78,6 @@ endif()
 
 # C++17 is used. We requires fold expressions at least.
 set_target_properties(git-tui PROPERTIES CXX_STANDARD 17)
-
 
 # ------------------------------------------------------------------------------
 
