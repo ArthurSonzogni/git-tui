@@ -21,27 +21,25 @@ jobs:
           - name: Linux GCC
             os: ubuntu-latest
             compiler: g++-9
-            test: true
 
           - name: Linux Clang
             os: ubuntu-latest
             compiler: clang++
-            test: true
 
           - name: MacOS clang
             os: macos-latest
             compiler: clang++
-            test: true
 
           - name: Windows MSVC
             os: windows-latest
             compiler: cl
-            test: false
 
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: "Enable MSVC command prompt"
         if: matrix.os == 'windows-latest'
@@ -58,12 +56,6 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
           -DCMAKE_BUILD_TYPE=Debug;
           cmake --build . --target git-tui;
-
-      - name: "Run tests"
-        if: matrix.test
-        run: >
-          cd build;
-          ./tests
 
   # Create a release on new v* tags
   release:
@@ -99,6 +91,8 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: "Install cmake"
         uses: lukka/get-cmake@latest
@@ -107,7 +101,7 @@ jobs:
         run: >
           mkdir build;
           cd build;
-          cmake ..  -DCMAKE_BUILD_TYPE=Release
+          cmake ..  -DCMAKE_BUILD_TYPE=Release;
           cmake --build . --target package;
       - uses: shogo82148/actions-upload-release-asset@v1
         with:

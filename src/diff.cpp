@@ -22,6 +22,12 @@
 #include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
 #include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
+#ifdef RGB
+// Workaround for wingdi.h (via Windows.h) defining macros that break things.
+// https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-rgb
+#undef RGB
+#endif
+
 using namespace ftxui;
 
 namespace gittui::diff {
