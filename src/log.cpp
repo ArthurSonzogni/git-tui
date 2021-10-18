@@ -10,7 +10,8 @@
 #include <iterator>                // for end, begin
 #include <map>                     // for map, map<>::mapped_type
 #include <memory>  // for allocator, shared_ptr, unique_ptr, __shared_ptr_access, make_unique
-#include <queue>   // for queue
+#include <queue>  // for queue
+#include <sstream>
 #include <string>  // for string, basic_string, operator+, char_traits, to_string, getline, operator<
 #include <utility>  // for move
 #include <vector>   // for vector
