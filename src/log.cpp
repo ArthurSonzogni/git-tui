@@ -22,14 +22,23 @@
 #include "ftxui/component/component_base.hpp"  // for ComponentBase
 #include "ftxui/component/event.hpp"           // for Event
 #include "ftxui/screen/color.hpp"  // for Color, Color::Green, Color::Red, Color::Black, Color::White
-#include "process.hpp"   // for process
-#include "scroller.hpp"  // for Scroller
+#include "scroller.hpp"    // for Scroller
+#include "subprocess.hpp"  // for process
 
 using namespace ftxui;
 namespace gittui::log {
 
 std::string ResolveHead() {
-  return ExecuteProcess("git rev-list HEAD -1");
+  auto process = subprocess::run({"git", "rev-list", "HEAD", "-1"},
+                                 subprocess::RunBuilder()                 //
+                                     .cerr(subprocess::PipeOption::pipe)  //
+                                     .cout(subprocess::PipeOption::pipe)  //
+                                     .cin(subprocess::PipeOption::close)  //
+  );
+
+  std::string out = std::move(process.cout);
+  out.erase(std::remove(std::begin(out), std::end(out), '\n'), std::end(out));
+  return out;
 }
 
 struct Commit {
@@ -51,9 +60,20 @@ Commit* GetCommit(std::wstring hash) {
   Commit* commit = g_commit[hash].get();
   commit->hash = hash;
 
-  std::string data = ExecuteProcess("git cat-file commit " + to_string(hash));
-  std::stringstream ss;
-  ss << data;
+  std::string hash_str = to_string(hash);
+  auto process = subprocess::run(
+      {
+          "git",
+          "cat-file",
+          "commit",
+          hash_str,
+      },
+      subprocess::RunBuilder()                 //
+          .cerr(subprocess::PipeOption::pipe)  //
+          .cout(subprocess::PipeOption::pipe)  //
+          .cin(subprocess::PipeOption::close)  //
+  );
+  std::stringstream ss(process.cout);
 
   std::string line;
   while (std::getline(ss, line)) {
@@ -129,12 +149,21 @@ int main(int argc, const char** argv) {
     files.clear();
     menu_files_entries.clear();
 
-    std::string diff =
-        ExecuteProcess("git diff -U" + std::to_string(hunk_size) + " " +  //
-                       to_string(commit->hash) + "~..." +                 //
-                       to_string(commit->hash));
+    auto hash = to_string(commit->hash);
+    auto process = subprocess::run(
+        {
+            "git",
+            "diff",
+            "-U" + std::to_string(hunk_size),
+            hash + "~..." + hash,
+        },
+        subprocess::RunBuilder()                 //
+            .cerr(subprocess::PipeOption::pipe)  //
+            .cout(subprocess::PipeOption::pipe)  //
+            .cin(subprocess::PipeOption::close)  //
+    );
 
-    files = diff::Parse(diff);
+    files = diff::Parse(process.cout);
     menu_files_entries.push_back(L"description");
     for (const auto& file : files)
       menu_files_entries.push_back(file.right_file);

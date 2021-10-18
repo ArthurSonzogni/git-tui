@@ -14,6 +14,18 @@ if(NOT ftxui_POPULATED)
   FetchContent_Populate(ftxui)
   add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+
+FetchContent_Declare(subprocess
+  GIT_REPOSITORY https://github.com/benman64/subprocess
+  GIT_TAG e1cae5e86e5d089e65e906f7c13917b7bbb75d04
+  )
+
+FetchContent_GetProperties(subprocess)
+if(NOT subprocess_POPULATED)
+  FetchContent_Populate(subprocess)
+  add_subdirectory(${subprocess_SOURCE_DIR} ${subprocess_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
 # ------------------------------------------------------------------------------
 
 set(git_tag 0)
@@ -48,8 +60,6 @@ add_executable(git-tui
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp
-  src/process.hpp
-  src/process.cpp
   )
 
 target_include_directories(git-tui
@@ -58,6 +68,7 @@ target_include_directories(git-tui
   )
 
 target_link_libraries(git-tui
+  PRIVATE subprocess
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component # Not needed for this example.

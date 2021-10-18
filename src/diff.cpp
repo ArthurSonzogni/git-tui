@@ -17,8 +17,8 @@
 #include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
 #include "ftxui/dom/elements.hpp"  // for text, operator|, vbox, separator, Element, Elements, filler, bgcolor, size, window, xflex, color, hbox, dim, EQUAL, WIDTH, xflex_grow, xflex_shrink, yflex
 #include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
-#include "process.hpp"             // for process
 #include "scroller.hpp"            // for Scroller
+#include "subprocess.hpp"
 
 using namespace ftxui;
 
@@ -223,12 +223,22 @@ int main(int argc, const char** argv) {
     files.clear();
     file_menu_entries.clear();
 
-    std::string command = "git diff -U" + std::to_string(hunk_size);
+    std::vector<std::string> args = {
+        "git",
+        "diff",
+        "-U" + std::to_string(hunk_size)
+    };
     for (int i = 0; i < argc; ++i)
-      command += std::string(" ") + argv[i];
+      args.push_back(argv[i]);
 
-    std::string diff = ExecuteProcess(command);
-    files = Parse(diff);
+    auto process = subprocess::run(std::move(args),
+                                   subprocess::RunBuilder()                 //
+                                       .cerr(subprocess::PipeOption::pipe)  //
+                                       .cout(subprocess::PipeOption::pipe)  //
+                                       .cin(subprocess::PipeOption::close)  //
+    );
+
+    files = Parse(process.cout);
     for (const auto& file : files)
       file_menu_entries.push_back(file.right_file);
   };
