@@ -50,6 +50,14 @@ class ScrollerBase : public ComponentBase {
          (event.is_mouse() && event.mouse().button == Mouse::WheelDown))) {
       selected_++;
     }
+    if (event == Event::PageDown)
+      selected_ += box_.y_max - box_.y_min;
+    if (event == Event::PageUp)
+      selected_ -= box_.y_max - box_.y_min;
+    if (event == Event::Home)
+      selected_ = 0;
+    if (event == Event::End)
+      selected_ = size_;
 
     selected_ = std::max(0, std::min(size_ - 1, selected_));
     return selected_old != selected_;
