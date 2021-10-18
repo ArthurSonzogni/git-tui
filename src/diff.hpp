@@ -2,7 +2,7 @@
 #define GIT_DIFF_TUI_DIFF_HPP
 
 #include <ftxui/dom/elements.hpp>  // for Element
-#include <string>                  // for wstring, string
+#include <string>                  // for string, string
 #include <vector>                  // for vector
 
 #include "ftxui/screen/box.hpp"  // for ftxui
@@ -17,7 +17,7 @@ struct Line {
     Delete,
   };
   Type type;
-  std::wstring content;
+  std::string content;
 };
 
 struct Hunk {
@@ -27,8 +27,8 @@ struct Hunk {
 };
 
 struct File {
-  std::wstring left_file;
-  std::wstring right_file;
+  std::string left_file;
+  std::string right_file;
   std::vector<Hunk> hunks;
 };
 

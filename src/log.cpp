@@ -1,29 +1,29 @@
 #include "log.hpp"
 
-#include <stdlib.h>   // for EXIT_SUCCESS
-#include <algorithm>  // for copy
-#include <ftxui/component/component.hpp>  // for Horizontal, Renderer, Button, Menu, CatchEvent, Checkbox, Vertical
+#include <stdlib.h>                       // for EXIT_SUCCESS
+#include <algorithm>                      // for max, copy, remove
+#include <ftxui/component/component.hpp>  // for Renderer, Button, Menu, ResizableSplitLeft, CatchEvent, Checkbox, Horizontal, Vertical
 #include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive
-#include <ftxui/dom/elements.hpp>  // for operator|, text, separator, Element, size, xflex, vbox, color, yframe, hbox, bold, EQUAL, WIDTH, filler, Elements, nothing, yflex, bgcolor
-#include <ftxui/screen/string.hpp>  // for to_wstring, to_string
-#include <functional>               // for function
-#include <iostream>                 // for basic_istream, char_traits
-#include <iterator>                 // for istreambuf_iterator, operator!=
-#include <map>                      // for map, map<>::mapped_type
-#include <memory>  // for allocator, shared_ptr, __shared_ptr_access, unique_ptr, make_unique
-#include <queue>  // for queue
-#include <sstream>
-#include <string>  // for wstring, basic_string, string, getline, operator+, operator<, to_string
+#include <ftxui/dom/elements.hpp>  // for operator|, text, Element, color, bold, xflex, hbox, separator, filler, vbox, Elements, vscroll_indicator, yflex, yframe, flex, bgcolor
+#include <functional>              // for function
+#include <iostream>                // for basic_istream, stringstream
+#include <iterator>                // for end, begin
+#include <map>                     // for map, map<>::mapped_type
+#include <memory>  // for allocator, shared_ptr, unique_ptr, __shared_ptr_access, make_unique
+#include <queue>   // for queue
+#include <string>  // for string, basic_string, operator+, char_traits, to_string, getline, operator<
 #include <utility>  // for move
 #include <vector>   // for vector
 
-#include "diff.hpp"                            // for File, Parse, Render
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component_base.hpp"  // for ComponentBase
-#include "ftxui/component/event.hpp"           // for Event
+#include "diff.hpp"                               // for File, Parse, Render
+#include "ftxui/component/captured_mouse.hpp"     // for ftxui
+#include "ftxui/component/component_base.hpp"     // for ComponentBase
+#include "ftxui/component/component_options.hpp"  // for MenuOption, ButtonOption
+#include "ftxui/component/event.hpp"              // for Event, Event::Escape
 #include "ftxui/screen/color.hpp"  // for Color, Color::Green, Color::Red, Color::Black, Color::White
-#include "scroller.hpp"    // for Scroller
-#include "subprocess.hpp"  // for process
+#include "scroller.hpp"                   // for Scroller
+#include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
+#include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
 using namespace ftxui;
 namespace gittui::log {
@@ -42,17 +42,17 @@ std::string ResolveHead() {
 }
 
 struct Commit {
-  std::wstring hash;
-  std::wstring title;
-  std::wstring tree;
-  std::vector<std::wstring> authors;
-  std::vector<std::wstring> body;
-  std::vector<std::wstring> committers;
-  std::vector<std::wstring> parents;
+  std::string hash;
+  std::string title;
+  std::string tree;
+  std::vector<std::string> authors;
+  std::vector<std::string> body;
+  std::vector<std::string> committers;
+  std::vector<std::string> parents;
 };
 
-Commit* GetCommit(std::wstring hash) {
-  static std::map<std::wstring, std::unique_ptr<Commit>> g_commit;
+Commit* GetCommit(std::string hash) {
+  static std::map<std::string, std::unique_ptr<Commit>> g_commit;
   if (g_commit[hash])
     return g_commit[hash].get();
 
@@ -60,13 +60,12 @@ Commit* GetCommit(std::wstring hash) {
   Commit* commit = g_commit[hash].get();
   commit->hash = hash;
 
-  std::string hash_str = to_string(hash);
   auto process = subprocess::run(
       {
           "git",
           "cat-file",
           "commit",
-          hash_str,
+          hash,
       },
       subprocess::RunBuilder()                 //
           .cerr(subprocess::PipeOption::pipe)  //
@@ -78,22 +77,22 @@ Commit* GetCommit(std::wstring hash) {
   std::string line;
   while (std::getline(ss, line)) {
     if (line.find("tree ", 0) == 0) {
-      commit->tree = to_wstring(line.substr(5));
+      commit->tree = line.substr(5);
       continue;
     }
 
     if (line.find("parent", 0) == 0) {
-      commit->parents.push_back(to_wstring(line.substr(7)));
+      commit->parents.push_back(line.substr(7));
       continue;
     }
 
     if (line.find("author", 0) == 0) {
-      commit->authors.push_back(to_wstring(line.substr(7)));
+      commit->authors.push_back(line.substr(7));
       continue;
     }
 
     if (line.find("committer", 0) == 0) {
-      commit->committers.push_back(to_wstring(line.substr(10)));
+      commit->committers.push_back(line.substr(10));
       continue;
     }
 
@@ -102,9 +101,9 @@ Commit* GetCommit(std::wstring hash) {
       while (std::getline(ss, line)) {
         ++index;
         if (index == 0)
-          commit->title = to_wstring(line);
-        if (index >= 2)
-          commit->body.push_back(to_wstring(line));
+          commit->title = std::move(line);
+        else if (index >= 2)
+          commit->body.push_back(std::move(line));
       }
       break;
     }
@@ -118,15 +117,15 @@ int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
   std::vector<Commit*> commits;
-  std::vector<std::wstring> menu_commit_entries;
+  std::vector<std::string> menu_commit_entries;
   int menu_commit_index = 0;
 
-  std::queue<std::wstring> todo;
-  todo.push(to_wstring(ResolveHead()));
+  std::queue<std::string> todo;
+  todo.push(ResolveHead());
 
   auto refresh_commit_list = [&] {
     while (!todo.empty() && menu_commit_index > (int)commits.size() - 80) {
-      std::wstring hash = todo.front();
+      std::string hash = todo.front();
       todo.pop();
 
       Commit* commit = GetCommit(hash);
@@ -142,20 +141,19 @@ int main(int argc, const char** argv) {
   int hunk_size = 3;
   bool split = true;
   std::vector<diff::File> files;
-  std::vector<std::wstring> menu_files_entries;
+  std::vector<std::string> menu_files_entries;
   int menu_files_index = 0;
   auto refresh_files = [&] {
     Commit* commit = commits[menu_commit_index];
     files.clear();
     menu_files_entries.clear();
 
-    auto hash = to_string(commit->hash);
     auto process = subprocess::run(
         {
             "git",
             "diff",
             "-U" + std::to_string(hunk_size),
-            hash + "~..." + hash,
+            commit->hash + "~..." + commit->hash,
         },
         subprocess::RunBuilder()                 //
             .cerr(subprocess::PipeOption::pipe)  //
@@ -164,7 +162,7 @@ int main(int argc, const char** argv) {
     );
 
     files = diff::Parse(process.cout);
-    menu_files_entries.push_back(L"description");
+    menu_files_entries.push_back("description");
     for (const auto& file : files)
       menu_files_entries.push_back(file.right_file);
   };
@@ -188,37 +186,37 @@ int main(int argc, const char** argv) {
 
     for (const auto& committer : commit->committers) {
       elements.push_back(hbox({
-          text(L"committer:") | bold | color(Color::Green),
+          text("committer:") | bold | color(Color::Green),
           text(committer) | xflex,
       }));
     }
 
     for (const auto& author : commit->authors) {
       elements.push_back(hbox({
-          text(L"   author:") | bold | color(Color::Green),
+          text("   author:") | bold | color(Color::Green),
           text(author) | xflex,
       }));
     }
 
     elements.push_back(hbox({
-        text(L"     hash:") | bold | color(Color::Green),
+        text("     hash:") | bold | color(Color::Green),
         text(commit->hash) | xflex,
     }));
 
     for (const auto& parent : commit->parents) {
       elements.push_back(hbox({
-          text(L"   parent:") | bold | color(Color::Green),
+          text("   parent:") | bold | color(Color::Green),
           text(parent) | xflex,
       }));
     }
 
     elements.push_back(hbox({
-        text(L"     tree:") | bold | color(Color::Green),
+        text("     tree:") | bold | color(Color::Green),
         text(commit->tree) | xflex,
     }));
 
     elements.push_back(hbox({
-        text(L"    title:") | bold | color(Color::Red),
+        text("    title:") | bold | color(Color::Red),
         text(commit->title) | xflex,
     }));
 
@@ -259,12 +257,12 @@ int main(int argc, const char** argv) {
 
   auto option_renderer = Renderer(options, [&] {
     return hbox({
-               text(L"[git tui log]"),
+               text("[git tui log]"),
                filler(),
                split_checkbox->Render(),
-               text(L"   Context:"),
+               text("   Context:"),
                button_decrease_hunk->Render(),
-               text(to_wstring(hunk_size)),
+               text(std::to_string(hunk_size)),
                button_increase_hunk->Render(),
                filler(),
                button_quit->Render(),
@@ -274,7 +272,7 @@ int main(int argc, const char** argv) {
 
   menu_files = Renderer(menu_files, [menu_files] {
     return vbox({
-        text(L"Commit"),
+        text("Commit"),
         separator(),
         menu_files->Render() | vscroll_indicator | yframe | yflex,
     });
@@ -282,7 +280,7 @@ int main(int argc, const char** argv) {
 
   menu_commit = Renderer(menu_commit, [menu_commit] {
     return vbox({
-        text(L"Files"),
+        text("Files"),
         separator(),
         menu_commit->Render() | vscroll_indicator | yframe | yflex,
     });
@@ -290,7 +288,7 @@ int main(int argc, const char** argv) {
 
   scroller = Renderer(scroller, [scroller] {
     return vbox({
-        text(L"Content"),
+        text("Content"),
         separator(),
         scroller->Render() | flex,
     });

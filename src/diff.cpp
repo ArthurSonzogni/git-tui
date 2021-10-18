@@ -1,24 +1,26 @@
 #include "diff.hpp"  // for File, Line, Hunk, Parse, Line::Add, Line::Delete, Line::Keep
 
-#include <assert.h>                 // for assert
-#include <stdlib.h>                 // for EXIT_SUCCESS
-#include <ftxui/screen/string.hpp>  // for to_wstring
-#include <iostream>  // for basic_istream, operator<<, stringstream, endl, basic_ios, basic_ostream, cout, ostream
-#include <iterator>  // for istreambuf_iterator, operator!=
+#include <assert.h>  // for assert
+#include <stdlib.h>  // for EXIT_SUCCESS
+#include <iostream>  // for operator<<, stringstream, endl, basic_ios, basic_istream, basic_ostream, cout, ostream
 #include <memory>  // for allocator_traits<>::value_type, shared_ptr, __shared_ptr_access
 #include <regex>  // for regex_match, match_results, match_results<>::_Base_type, sub_match, regex, smatch
 #include <sstream>  // IWYU pragma: keep
-#include <string>  // for wstring, operator+, allocator, basic_string, char_traits, string, stoi, getline, to_string
+#include <string>  // for string, allocator, to_string, basic_string, operator+, char_traits, stoi, getline
 #include <utility>  // for move
 #include <vector>   // for vector
-#include "ftxui/component/component.hpp"  // for Renderer, Button, Horizontal, CatchEvent, Checkbox, Menu, Vertical
+
+#include "ftxui/component/component.hpp"  // for Renderer, Button, CatchEvent, Checkbox, Horizontal, Menu, ResizableSplitLeft, Vertical
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/component_options.hpp"   // for ButtonOption
 #include "ftxui/component/event.hpp"               // for Event
 #include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "ftxui/dom/elements.hpp"  // for text, operator|, vbox, separator, Element, Elements, filler, bgcolor, size, window, xflex, color, hbox, dim, EQUAL, WIDTH, xflex_grow, xflex_shrink, yflex
+#include "ftxui/dom/deprecated.hpp"                // for text
+#include "ftxui/dom/elements.hpp"  // for operator|, text, separator, vbox, Element, Elements, bgcolor, size, xflex, color, filler, hbox, dim, EQUAL, WIDTH, flex, yflex
 #include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
 #include "scroller.hpp"            // for Scroller
-#include "subprocess.hpp"
+#include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
+#include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
 using namespace ftxui;
 
@@ -29,7 +31,6 @@ std::vector<File> Parse(std::string input) {
   std::string current;
   auto eat = [&]() -> bool { return !!std::getline(ss, current); };
   auto get = [&] { return current; };
-  auto getw = [&] { return ftxui::to_wstring(get()); };
   auto start_with = [&](const char* prefix) {
     return get().rfind(prefix, 0) == 0;
   };
@@ -50,13 +51,13 @@ std::vector<File> Parse(std::string input) {
 
     if (start_with("---") && parse_header) {
       assert(files.size() != 0);
-      files.back().left_file = getw().substr(3);
+      files.back().left_file = get().substr(3);
       continue;
     }
 
     if (start_with("+++") && parse_header) {
       assert(files.size() != 0);
-      files.back().right_file = getw().substr(6);
+      files.back().right_file = get().substr(6);
       continue;
     }
 
@@ -77,21 +78,21 @@ std::vector<File> Parse(std::string input) {
     if (start_with(" ")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Keep;
-      files.back().hunks.back().lines.back().content = getw().substr(1);
+      files.back().hunks.back().lines.back().content = get().substr(1);
       continue;
     }
 
     if (start_with("+")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Add;
-      files.back().hunks.back().lines.back().content = getw().substr(1);
+      files.back().hunks.back().lines.back().content = get().substr(1);
       continue;
     }
 
     if (start_with("-")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Delete;
-      files.back().hunks.back().lines.back().content = getw().substr(1);
+      files.back().hunks.back().lines.back().content = get().substr(1);
       continue;
     }
   }
@@ -119,20 +120,20 @@ Element RenderSplit(const Hunk& hunk) {
     switch (line.type) {
       case Line::Keep:
         stabilize();
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
+        left_line_numbers.push_back(text(std::to_string(left_line_number++)));
+        right_line_numbers.push_back(text(std::to_string(right_line_number++)));
         left_lines.push_back(text(line.content));
         right_lines.push_back(text(line.content));
         break;
 
       case Line::Delete:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
+        left_line_numbers.push_back(text(std::to_string(left_line_number++)));
         left_lines.push_back(text(line.content) |
                              color(Color::RGB(255, 200, 200)) |
                              bgcolor(Color::RGB(128, 0, 0)));
         break;
       case Line::Add:
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
+        right_line_numbers.push_back(text(std::to_string(right_line_number++)));
         right_lines.push_back(text(line.content) |
                               color(Color::RGB(200, 255, 200)) |
                               bgcolor(Color::RGB(0, 128, 0)));
@@ -161,20 +162,20 @@ Element RenderJoin(const Hunk& hunk) {
   for (const Line& line : hunk.lines) {
     switch (line.type) {
       case Line::Keep:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
+        left_line_numbers.push_back(text(std::to_string(left_line_number++)));
+        right_line_numbers.push_back(text(std::to_string(right_line_number++)));
         lines.push_back(text(line.content));
         break;
 
       case Line::Delete:
-        left_line_numbers.push_back(text(to_wstring(left_line_number++)));
+        left_line_numbers.push_back(text(std::to_string(left_line_number++)));
         right_line_numbers.push_back(text(L"~") | dim);
         lines.push_back(text(line.content) | color(Color::RGB(255, 200, 200)) |
                         bgcolor(Color::RGB(128, 0, 0)));
         break;
       case Line::Add:
         left_line_numbers.push_back(text(L"~") | dim);
-        right_line_numbers.push_back(text(to_wstring(right_line_number++)));
+        right_line_numbers.push_back(text(std::to_string(right_line_number++)));
         lines.push_back(text(line.content) | color(Color::RGB(200, 255, 200)) |
                         bgcolor(Color::RGB(0, 128, 0)));
         break;
@@ -217,17 +218,14 @@ int main(int argc, const char** argv) {
   int hunk_size = 3;
 
   std::vector<File> files;
-  std::vector<std::wstring> file_menu_entries;
+  std::vector<std::string> file_menu_entries;
 
   auto refresh_data = [&] {
     files.clear();
     file_menu_entries.clear();
 
-    std::vector<std::string> args = {
-        "git",
-        "diff",
-        "-U" + std::to_string(hunk_size)
-    };
+    std::vector<std::string> args = {"git", "diff",
+                                     "-U" + std::to_string(hunk_size)};
     for (int i = 0; i < argc; ++i)
       args.push_back(argv[i]);
 
@@ -286,7 +284,7 @@ int main(int argc, const char** argv) {
     return vbox({
                text(L" Difference "),
                separator(),
-               text(file.left_file + L" -> " + file.right_file),
+               text(file.left_file + " -> " + file.right_file),
                separator(),
                scroller->Render(),
            }) |
@@ -314,7 +312,7 @@ int main(int argc, const char** argv) {
                split_checkbox->Render(),
                text(L"   Context:"),
                button_decrease_hunk->Render(),
-               text(to_wstring(hunk_size)),
+               text(std::to_string(hunk_size)),
                button_increase_hunk->Render(),
                filler(),
            }) |
