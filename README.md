@@ -9,14 +9,8 @@
 </h3>
 
 <p align="center">
-  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=linux-clang.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/linux-clang.yaml/badge.svg?branch=master" alt="GitHub action linux clang">
-  </a>
-  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=linux-gcc.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/linux-gcc.yaml/badge.svg?branch=master" alt="GitHub action linux gcc">
-  </a>
-  <a href="https://github.com/ArthurSonzogni/git-tui/actions?workflow=mac-clang.yaml">
-    <img src="https://github.com/ArthurSonzogni/git-tui/actions/workflows/mac-clang.yaml/badge.svg?branch=master" alt="GitHub action mac clang">
+  <a href="https://github.com/ArthurSonzogni/git-tui/releases/latest">
+    <img src="https://img.shields.io/badge/-Latest-blue">
   </a>
   <a href="https://github.com/ArthurSonzogni/git-tui/blob/master/LICENSE.md">
     <img src="https://img.shields.io/github/license/ArthurSonzogni/git-tui" alt="LICENSE">
