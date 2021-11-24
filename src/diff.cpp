@@ -271,8 +271,10 @@ int main(int argc, const char** argv) {
   int file_menu_selected = 0;
   auto file_menu = Menu(&file_menu_entries, &file_menu_selected);
 
+  auto screen = ScreenInteractive::Fullscreen();
   bool split = true;
   auto split_checkbox = Checkbox("[S]plit", &split);
+  auto button_quit = Button("[Q]uit", screen.ExitLoopClosure(), button_option);
 
   auto scroller = Scroller(
       Renderer([&] { return Render(files[file_menu_selected], split); }));
@@ -309,6 +311,7 @@ int main(int argc, const char** argv) {
       split_checkbox,
       button_decrease_hunk,
       button_increase_hunk,
+      button_quit
   });
 
   auto option_renderer = Renderer(options, [&] {
@@ -321,6 +324,7 @@ int main(int argc, const char** argv) {
                text(std::to_string(hunk_size)),
                button_increase_hunk->Render(),
                filler(),
+               button_quit->Render(),
            }) |
            bgcolor(Color::White) | color(Color::Black);
   });
@@ -346,12 +350,16 @@ int main(int argc, const char** argv) {
       return true;
     }
 
+    if (event == Event::Character('q') || event == Event::Escape) {
+      screen.ExitLoopClosure()();
+      return true;
+    }
+
     return false;
   });
 
   file_menu->TakeFocus();
 
-  auto screen = ScreenInteractive::Fullscreen();
   screen.Loop(final_container);
 
   return EXIT_SUCCESS;
