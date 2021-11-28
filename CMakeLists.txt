@@ -6,7 +6,7 @@ include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG 313ce9c35fe234e6c322b709dd89f26468eeb0cb
+  GIT_TAG cecd54df42dd66fdf8386ed461e16b725bffc827
   )
 
 FetchContent_GetProperties(ftxui)
@@ -71,7 +71,7 @@ target_link_libraries(git-tui
   PRIVATE subprocess
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
-  PRIVATE ftxui::component # Not needed for this example.
+  PRIVATE ftxui::component
   )
 
 if (MSVC)
@@ -103,7 +103,7 @@ install(TARGETS git-tui RUNTIME DESTINATION "bin")
 
 # ------------------------------------------------------------------------------
 if (UNIX AND NOT APPLE)
-  set(CPACK_GENERATOR "DEB;RPM;TGZ;ZIP")
+  set(CPACK_GENERATOR "DEB;External;RPM;STGZ;TBZ2;TGZ;TXZ;TZ;TZST;ZIP")
 elseif (UNIX AND APPLE)
   set(CPACK_GENERATOR "DragNDrop;NuGet;TGZ;ZIP")
 elseif (WIN32)
