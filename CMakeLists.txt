@@ -2,28 +2,42 @@ cmake_minimum_required (VERSION 3.15)
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
-
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
+set(FETCHCONTENT_QUIET FALSE)
+
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG cecd54df42dd66fdf8386ed461e16b725bffc827
-  )
-
-FetchContent_GetProperties(ftxui)
-if(NOT ftxui_POPULATED)
-  FetchContent_Populate(ftxui)
-  add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+  GIT_TAG 81b7207121e41c3b838eca6f54396e4f676fa3d8
+  GIT_PROGRESS TRUE
+  GIT_SHALLOW FALSE
+)
 
 FetchContent_Declare(subprocess
   GIT_REPOSITORY https://github.com/benman64/subprocess
   GIT_TAG e1cae5e86e5d089e65e906f7c13917b7bbb75d04
+  GIT_PROGRESS TRUE
+  GIT_SHALLOW FALSE
+)
+
+FetchContent_GetProperties(ftxui)
+if(NOT ftxui_POPULATED)
+  FetchContent_Populate(ftxui)
+  add_subdirectory(
+    ${ftxui_SOURCE_DIR}
+    ${ftxui_BINARY_DIR}
+    EXCLUDE_FROM_ALL
   )
+endif()
+
 
 FetchContent_GetProperties(subprocess)
 if(NOT subprocess_POPULATED)
   FetchContent_Populate(subprocess)
-  add_subdirectory(${subprocess_SOURCE_DIR} ${subprocess_BINARY_DIR} EXCLUDE_FROM_ALL)
+  add_subdirectory(
+    ${subprocess_SOURCE_DIR}
+    ${subprocess_BINARY_DIR}
+    EXCLUDE_FROM_ALL
+  )
 endif()
 
 # ------------------------------------------------------------------------------
@@ -46,7 +60,7 @@ endif()
 project(git-tui
   LANGUAGES CXX
   VERSION ${git_tag}
-  )
+)
 
 add_executable(git-tui
   src/diff.cpp
@@ -60,19 +74,19 @@ add_executable(git-tui
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp
-  )
+)
 
 target_include_directories(git-tui
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-  )
+)
 
 target_link_libraries(git-tui
   PRIVATE subprocess
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component
-  )
+)
 
 if (MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -84,7 +98,7 @@ else()
     PRIVATE "-pedantic"
     PRIVATE "-Werror"
     PRIVATE "-Wdeprecated"
-    )
+  )
 endif()
 
 # C++17 is used. We requires fold expressions at least.
