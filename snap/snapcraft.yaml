@@ -24,6 +24,8 @@ parts:
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_BUILD_TYPE=Release
+    stage-packages:
+      - git
 
 passthrough:
   title: git-tui
