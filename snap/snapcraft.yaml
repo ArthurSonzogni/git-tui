@@ -1,15 +1,15 @@
 name: git-tui
-adopt-info: git-tui
+version: 1.0.9
 summary: A collection of human friendly terminal interfaces for git.
 description: A collection of human friendly terminal interfaces for git.
 
 grade: stable
 confinement: strict
-base: core18
+base: core20
 
 apps:
   git-tui:
-    command: git-tui
+    command: usr/bin/git-tui
     plugs:
       - home
 
@@ -18,18 +18,12 @@ parts:
     plugin: cmake
     source: https://github.com/ArthurSonzogni/git-tui
     source-type: git
-    build-snaps: [cmake/latest/edge] # We need a modern cmake.
-    stage-packages:
-      - git
-    override-build: |
-      /snap/bin/cmake \
-        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL\
-        -DCMAKE_BUILD_TYPE=Release \
-        $SNAPCRAFT_PART_SRC
-      make -j 4
-      make install
-      GIT_TUI_VERSION=`$SNAPCRAFT_PART_INSTALL/bin/git-tui version`;
-      snapcraftctl set-version "${GIT_TUI_VERSION}"
+    source-depth: 1
+    build-packages:
+      - build-essential
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=Release
 
 passthrough:
   title: git-tui

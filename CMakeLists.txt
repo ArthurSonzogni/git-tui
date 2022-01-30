@@ -41,25 +41,9 @@ if(NOT subprocess_POPULATED)
 endif()
 
 # ------------------------------------------------------------------------------
-
-set(git_tag 0)
-find_package(Git QUIET)
-if (Git_FOUND)
-  execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --tags
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE git_tag
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  string(REGEX REPLACE "v\(.*\)-.*" "\\1" git_tag ${git_tag})
-  string(REGEX REPLACE "v" "" git_tag ${git_tag})
-  string(REGEX REPLACE "-" "."  git_tag ${git_tag})
-endif()
-
-
 project(git-tui
   LANGUAGES CXX
-  VERSION ${git_tag}
+  VERSION 1.0.9
 )
 
 add_executable(git-tui
