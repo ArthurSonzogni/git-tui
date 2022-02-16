@@ -304,7 +304,7 @@ int main(int argc, const char** argv) {
       ResizableSplitLeft(file_menu_renderer, file_renderer, &file_menu_width);
 
   auto layout_renderer = Renderer(layout, [&] {
-    return layout->Render() | bgcolor(Color::RGB(30, 30, 30)) | yflex;
+    return layout->Render() | yflex;
   });
 
   auto options = Container::Horizontal({
