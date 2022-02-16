@@ -273,7 +273,7 @@ int main(int argc, const char** argv) {
 
   menu_files = Renderer(menu_files, [menu_files] {
     return vbox({
-        text("Commit"),
+        text("Files"),
         separator(),
         menu_files->Render() | vscroll_indicator | yframe | yflex,
     });
@@ -281,7 +281,7 @@ int main(int argc, const char** argv) {
 
   menu_commit = Renderer(menu_commit, [menu_commit] {
     return vbox({
-        text("Files"),
+        text("Commit"),
         separator(),
         menu_commit->Render() | vscroll_indicator | yframe | yflex,
     });
