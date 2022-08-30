@@ -1,3 +1,6 @@
+# (head)
+- Update FTXUI version.
+
 # v1.0.8
 - Support PageDown,PageUp,HomeEnd button.
 - Stop inheriting stderr/stdin for subprocesses.
