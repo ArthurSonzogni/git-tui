@@ -1,5 +1,6 @@
 # (head)
 - Update FTXUI version.
+- Fix issue 10: Windows Github Release contains Debug version.
 
 # v1.0.8
 - Support PageDown,PageUp,HomeEnd button.
