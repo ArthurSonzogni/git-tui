@@ -19,6 +19,7 @@
 #include "ftxui/dom/elements.hpp"  // for operator|, text, separator, vbox, Element, Elements, bgcolor, size, xflex, color, filler, hbox, dim, EQUAL, WIDTH, flex, yflex
 #include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
 #include "scroller.hpp"            // for Scroller
+#include "simple_button_options.hpp"
 #include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
 #include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
@@ -262,8 +263,7 @@ int main(int argc, const char** argv) {
       hunk_size--;
     refresh_data();
   };
-  auto button_option = ButtonOption();
-  button_option.border = false;
+  auto button_option = SimpleButtonOption();
   auto button_increase_hunk = Button("[+1]", increase_hunk, button_option);
   auto button_decrease_hunk = Button("[-1]", decrease_hunk, button_option);
 

@@ -7,7 +7,7 @@ set(FETCHCONTENT_QUIET FALSE)
 
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG 81b7207121e41c3b838eca6f54396e4f676fa3d8
+  GIT_TAG 1d76a2321c5368c6a136fb0860bbce82d68f0f96
   GIT_PROGRESS TRUE
   GIT_SHALLOW FALSE
 )
@@ -47,6 +47,7 @@ project(git-tui
 )
 
 add_executable(git-tui
+  src/simple_button_options.hpp
   src/diff.cpp
   src/diff.hpp
   src/log.cpp

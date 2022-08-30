@@ -22,7 +22,8 @@
 #include "ftxui/component/component_options.hpp"  // for MenuOption, ButtonOption
 #include "ftxui/component/event.hpp"              // for Event, Event::Escape
 #include "ftxui/screen/color.hpp"  // for Color, Color::Green, Color::Red, Color::Black, Color::White
-#include "scroller.hpp"                   // for Scroller
+#include "scroller.hpp"  // for Scroller
+#include "simple_button_options.hpp"
 #include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
 #include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
@@ -243,8 +244,7 @@ int main(int argc, const char** argv) {
     refresh_files();
   };
   auto split_checkbox = Checkbox("[S]plit", &split);
-  auto button_option = ButtonOption();
-  button_option.border = false;
+  auto button_option = SimpleButtonOption();
   auto button_increase_hunk = Button("[+1]", increase_hunk, button_option);
   auto button_decrease_hunk = Button("[-1]", decrease_hunk, button_option);
   auto button_quit = Button("[Q]uit", screen.ExitLoopClosure(), button_option);
