@@ -7,7 +7,7 @@ set(FETCHCONTENT_QUIET FALSE)
 
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG 8226c5aea7c740346e11a8a9234d40a87fd4435c
+  GIT_TAG b56afce48ccd472cd2c3a53e619de0db1e7227a4
   GIT_PROGRESS TRUE
   GIT_SHALLOW FALSE
 )
