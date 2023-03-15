@@ -33,6 +33,28 @@ using namespace ftxui;
 
 namespace gittui::diff {
 
+namespace {
+
+std::string ReplaceAll(const std::string& str,
+                       const std::string& from,
+                       const std::string& to) {
+  std::string result = str;
+  size_t start_pos = 0;
+  while ((start_pos = result.find(from, start_pos)) != std::string::npos) {
+    result.replace(start_pos, from.length(), to);
+    start_pos += to.length();
+  }
+  return result;
+}
+
+std::string NormalizeLine(const std::string& line) {
+  std::string result = line;
+  result = ReplaceAll(result, "\t", "  ");
+  return result;
+}
+
+}  // namespace
+
 std::vector<File> Parse(std::string input) {
   std::stringstream ss(input);
   std::string current;
@@ -85,21 +107,24 @@ std::vector<File> Parse(std::string input) {
     if (start_with(" ")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Keep;
-      files.back().hunks.back().lines.back().content = get().substr(1);
+      files.back().hunks.back().lines.back().content =
+          NormalizeLine(get().substr(1));
       continue;
     }
 
     if (start_with("+")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Add;
-      files.back().hunks.back().lines.back().content = get().substr(1);
+      files.back().hunks.back().lines.back().content =
+          NormalizeLine(get().substr(1));
       continue;
     }
 
     if (start_with("-")) {
       files.back().hunks.back().lines.emplace_back();
       files.back().hunks.back().lines.back().type = Line::Delete;
-      files.back().hunks.back().lines.back().content = get().substr(1);
+      files.back().hunks.back().lines.back().content =
+          NormalizeLine(get().substr(1));
       continue;
     }
   }
