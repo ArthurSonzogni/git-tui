@@ -1,64 +1,37 @@
 cmake_minimum_required (VERSION 3.15)
-
-# --- Fetch FTXUI --------------------------------------------------------------
-include(FetchContent)
-set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
-set(FETCHCONTENT_QUIET FALSE)
-
-FetchContent_Declare(ftxui
-  GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG v4.0.0
-  GIT_PROGRESS TRUE
-  GIT_SHALLOW FALSE
-)
-
-FetchContent_Declare(subprocess
-  GIT_REPOSITORY https://github.com/benman64/subprocess
-  GIT_TAG e1cae5e86e5d089e65e906f7c13917b7bbb75d04
-  GIT_PROGRESS TRUE
-  GIT_SHALLOW FALSE
-)
-
-FetchContent_GetProperties(ftxui)
-if(NOT ftxui_POPULATED)
-  FetchContent_Populate(ftxui)
-  add_subdirectory(
-    ${ftxui_SOURCE_DIR}
-    ${ftxui_BINARY_DIR}
-    EXCLUDE_FROM_ALL
-  )
-endif()
-
-
-FetchContent_GetProperties(subprocess)
-if(NOT subprocess_POPULATED)
-  FetchContent_Populate(subprocess)
-  add_subdirectory(
-    ${subprocess_SOURCE_DIR}
-    ${subprocess_BINARY_DIR}
-    EXCLUDE_FROM_ALL
-  )
-endif()
-
-# ------------------------------------------------------------------------------
 project(git-tui
   LANGUAGES CXX
   VERSION 1.0.9
 )
 
+# --- Dependencies--------------------------------------------------------------
+include(cmake/find_or_fetch_package.cmake)
+
+find_or_fetch_package(ftxui v4.0.0
+  https://github.com/ArthurSonzogni/ftxui
+  d301fab1f4ecdd3544ed99b9c98e647d5804c341
+)
+
+find_or_fetch_package(subprocess v0.4.0
+  https://github.com/benman64/subprocess
+  e1cae5e86e5d089e65e906f7c13917b7bbb75d04
+)
+
+# ------------------------------------------------------------------------------
+
 add_executable(git-tui
-  src/simple_button_options.hpp
   src/diff.cpp
   src/diff.hpp
-  src/log.cpp
-  src/log.hpp
   src/help.cpp
   src/help.hpp
-  src/version.cpp
-  src/version.hpp
+  src/log.cpp
+  src/log.hpp
   src/main.cpp
   src/scroller.cpp
   src/scroller.hpp
+  src/simple_button_options.hpp
+  src/version.cpp
+  src/version.hpp
 )
 
 target_include_directories(git-tui
@@ -75,7 +48,6 @@ target_link_libraries(git-tui
 
 if (MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
 else()
   target_compile_options(git-tui
     PRIVATE "-Wall"
