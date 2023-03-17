@@ -1,4 +1,4 @@
-# Next
+# v1.1.0
 - Bugfix: Tab are now displayed with 2 spaces.
 
 # v1.0.9
