@@ -5,7 +5,6 @@
 #include "log.hpp"      // for main
 #include "version.hpp"  // for main
 #include <cstdlib>      // for main
-#include <iostream>     // for main
 
 // redirect all non implemented git commands to git
 void go_through_git(int argc, const char** argv, std::string command){
