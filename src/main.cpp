@@ -36,8 +36,6 @@ int main(int argc, const char** argv) {
   argc--;
   argv++;
 
-  // int arg_num = argc;
-
   if (command == "diff")
     return gittui::diff::main(argc, argv);
 
