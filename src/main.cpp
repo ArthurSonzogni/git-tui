@@ -8,14 +8,14 @@
 
 // redirect all non implemented git commands to git
 void go_through_git(int argc, const char** argv, std::string command){
-  std::string full_git_cmd = "git ";
-  full_git_cmd.append(command);
+  std::vector<std::string> args = {"git"};
+  args.push_back(command);
   
   for (int i = 0; i <  argc; i++){
-    full_git_cmd.append(" ");
-    full_git_cmd.append(argv[i]);
+    args.push_back(argv[i]);
   }
-  std::system(full_git_cmd.c_str());
+
+  subprocess::run(std::move(args));
 }
 
 
