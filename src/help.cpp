@@ -7,10 +7,26 @@ namespace gittui::help {
 int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
-  std::cout << "Usage: " << std::endl;
-  std::cout << " - git tui diff [args]*" << std::endl;
-  std::cout << " - git tui log [args]*" << std::endl;
-  std::cout << "" << std::endl;
+  std::cout << R"(
+git tui is a terminal user interface for git.
+
+Usage:
+  - git tui <command> [args]*
+
+Available TUI commands:
+  - diff
+  - log
+
+Fallback to git:
+  - git 
+  - ... (fallback to git)
+
+Other commands:
+  - version
+  - help
+
+)" << std::endl;
+
   return EXIT_SUCCESS;
 }
 }  // namespace gittui::help

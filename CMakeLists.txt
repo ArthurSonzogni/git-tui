@@ -22,6 +22,8 @@ find_or_fetch_package(subprocess v0.4.0
 add_executable(git-tui
   src/diff.cpp
   src/diff.hpp
+  src/git.cpp
+  src/git.hpp
   src/help.cpp
   src/help.hpp
   src/log.cpp
