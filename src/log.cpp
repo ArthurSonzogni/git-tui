@@ -3,27 +3,27 @@
 #include <stdlib.h>                       // for EXIT_SUCCESS
 #include <algorithm>                      // for max, copy, remove
 #include <ftxui/component/component.hpp>  // for Renderer, Button, Menu, ResizableSplitLeft, CatchEvent, Checkbox, Horizontal, Vertical
-#include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive
+#include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive, Component
 #include <ftxui/dom/elements.hpp>  // for operator|, text, Element, color, bold, xflex, hbox, separator, filler, vbox, Elements, vscroll_indicator, yflex, yframe, flex, bgcolor
 #include <functional>              // for function
 #include <iostream>                // for basic_istream, stringstream
 #include <iterator>                // for end, begin
 #include <map>                     // for map, map<>::mapped_type
-#include <memory>  // for allocator, shared_ptr, unique_ptr, __shared_ptr_access, make_unique
-#include <queue>  // for queue
-#include <sstream>
-#include <string>  // for string, basic_string, operator+, char_traits, to_string, getline, operator<
+#include <memory>  // for allocator, shared_ptr, __shared_ptr_access, unique_ptr, make_unique
+#include <queue>    // for queue
+#include <sstream>  // IWYU pragma: keep
+#include <string>  // for string, basic_string, operator+, char_traits, to_string, getline, operator<=>
 #include <utility>  // for move
 #include <vector>   // for vector
 
-#include "diff.hpp"                               // for File, Parse, Render
-#include "ftxui/component/captured_mouse.hpp"     // for ftxui
-#include "ftxui/component/component_base.hpp"     // for ComponentBase
+#include "diff.hpp"                            // for File, Parse, Render
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component_base.hpp"  // for ComponentBase, Component
 #include "ftxui/component/component_options.hpp"  // for MenuOption, ButtonOption
 #include "ftxui/component/event.hpp"              // for Event, Event::Escape
 #include "ftxui/screen/color.hpp"  // for Color, Color::Green, Color::Red, Color::Black, Color::White
-#include "scroller.hpp"  // for Scroller
-#include "simple_button_options.hpp"
+#include "scroller.hpp"                   // for Scroller
+#include "simple_button_options.hpp"      // for SimpleButtonOption
 #include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
 #include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 

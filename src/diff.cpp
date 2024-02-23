@@ -1,25 +1,26 @@
 #include "diff.hpp"  // for File, Line, Hunk, Parse, Line::Add, Line::Delete, Line::Keep
 
-#include <assert.h>  // for assert
-#include <stdlib.h>  // for EXIT_SUCCESS
+#include <assert.h>    // for assert
+#include <stdlib.h>    // for EXIT_SUCCESS, size_t
+#include <functional>  // for function
 #include <iostream>  // for operator<<, stringstream, endl, basic_ios, basic_istream, basic_ostream, cout, ostream
-#include <memory>  // for allocator_traits<>::value_type, shared_ptr, __shared_ptr_access
-#include <regex>  // for regex_match, match_results, match_results<>::_Base_type, sub_match, regex, smatch
+#include <memory>  // for allocator_traits<>::value_type, __shared_ptr_access, shared_ptr
+#include <regex>  // for regex_match, match_results, match_results<>::_Unchecked, sub_match, regex, smatch
 #include <sstream>  // IWYU pragma: keep
-#include <string>  // for string, allocator, to_string, basic_string, operator+, char_traits, stoi, getline
+#include <string>  // for string, allocator, to_string, operator+, basic_string, char_traits, stoi, getline
 #include <utility>  // for move
 #include <vector>   // for vector
 
 #include "ftxui/component/component.hpp"  // for Renderer, Button, CatchEvent, Checkbox, Horizontal, Menu, ResizableSplitLeft, Vertical
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-#include "ftxui/component/component_options.hpp"   // for ButtonOption
-#include "ftxui/component/event.hpp"               // for Event
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/component/component_base.hpp"  // for ComponentBase, Component
+#include "ftxui/component/component_options.hpp"  // for ButtonOption
+#include "ftxui/component/event.hpp"              // for Event, Event::Escape
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive, Component
 #include "ftxui/dom/deprecated.hpp"                // for text
-#include "ftxui/dom/elements.hpp"  // for operator|, text, separator, vbox, Element, Elements, bgcolor, size, xflex, color, filler, hbox, dim, EQUAL, WIDTH, flex, yflex
-#include "ftxui/screen/color.hpp"  // for Color, Color::Black, Color::White
+#include "ftxui/dom/elements.hpp"  // for operator|, text, separator, vbox, Element, Elements, size, xflex, bgcolor, color, filler, hbox, dim, EQUAL, WIDTH, flex, yflex
+#include "ftxui/screen/color.hpp"  // for Color, ftxui, Color::Black, Color::White
 #include "scroller.hpp"            // for Scroller
-#include "simple_button_options.hpp"
+#include "simple_button_options.hpp"      // for SimpleButtonOption
 #include "subprocess/ProcessBuilder.hpp"  // for RunBuilder, run
 #include "subprocess/basic_types.hpp"  // for PipeOption, PipeOption::pipe, CompletedProcess, PipeOption::close
 
@@ -328,16 +329,11 @@ int main(int argc, const char** argv) {
   auto layout =
       ResizableSplitLeft(file_menu_renderer, file_renderer, &file_menu_width);
 
-  auto layout_renderer = Renderer(layout, [&] {
-    return layout->Render() | yflex;
-  });
+  auto layout_renderer =
+      Renderer(layout, [&] { return layout->Render() | yflex; });
 
-  auto options = Container::Horizontal({
-      split_checkbox,
-      button_decrease_hunk,
-      button_increase_hunk,
-      button_quit
-  });
+  auto options = Container::Horizontal({split_checkbox, button_decrease_hunk,
+                                        button_increase_hunk, button_quit});
 
   auto option_renderer = Renderer(options, [&] {
     return hbox({

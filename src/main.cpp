@@ -1,5 +1,5 @@
-#include <cstdlib>      // for main
-#include <string>       // for operator==, allocator, basic_string, string
+#include <string>  // for operator==, basic_string, allocator, string
+
 #include "diff.hpp"     // for main
 #include "git.hpp"      // for main
 #include "help.hpp"     // for main
