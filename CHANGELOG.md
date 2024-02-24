@@ -1,3 +1,7 @@
+# v1.2.0
+- Feature: fallback to git for unsupported command.
+- Feature: Add the 'git' command to force using git
+
 # v1.1.0
 - Bugfix: Tab are now displayed with 2 spaces.
 

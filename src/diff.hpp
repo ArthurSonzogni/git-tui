@@ -2,7 +2,8 @@
 #define GIT_DIFF_TUI_DIFF_HPP
 
 #include <ftxui/dom/elements.hpp>  // for Element
-#include <string>                  // for string, string
+#include <ftxui/screen/color.hpp>  // for ftxui
+#include <string>                  // for string
 #include <vector>                  // for vector
 
 #include "ftxui/screen/box.hpp"  // for ftxui

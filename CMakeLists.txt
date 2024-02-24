@@ -7,9 +7,9 @@ project(git-tui
 # --- Dependencies--------------------------------------------------------------
 include(cmake/find_or_fetch_package.cmake)
 
-find_or_fetch_package(ftxui v4.0.0
+find_or_fetch_package(ftxui v5.0.0
   https://github.com/ArthurSonzogni/ftxui
-  d301fab1f4ecdd3544ed99b9c98e647d5804c341
+  cdf28903a7781f97ba94d30b79c3a4b0c97ccce7
 )
 
 find_or_fetch_package(subprocess v0.4.0
@@ -22,6 +22,8 @@ find_or_fetch_package(subprocess v0.4.0
 add_executable(git-tui
   src/diff.cpp
   src/diff.hpp
+  src/git.cpp
+  src/git.hpp
   src/help.cpp
   src/help.hpp
   src/log.cpp
@@ -57,9 +59,6 @@ else()
     PRIVATE "-Wdeprecated"
   )
 endif()
-
-# C++17 is used. We requires fold expressions at least.
-set_target_properties(git-tui PROPERTIES CXX_STANDARD 20)
 
 # ------------------------------------------------------------------------------
 
