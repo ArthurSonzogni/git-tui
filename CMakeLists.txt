@@ -60,8 +60,6 @@ else()
   )
 endif()
 
-set_target_properties(git-tui PROPERTIES CXX_STANDARD 23)
-
 # ------------------------------------------------------------------------------
 
 configure_file(
