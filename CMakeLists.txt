@@ -60,8 +60,9 @@ else()
   )
 endif()
 
-# C++17 is used. We requires fold expressions at least.
 set_target_properties(git-tui PROPERTIES CXX_STANDARD 20)
+set_target_properties(git-tui PROPERTIES CXX_STANDARD_REQUIRED ON)
+set_target_properties(git-tui PROPERTIES CXX_EXTENSIONS OFF)
 
 # ------------------------------------------------------------------------------
 
