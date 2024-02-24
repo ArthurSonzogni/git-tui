@@ -60,9 +60,7 @@ else()
   )
 endif()
 
-set_target_properties(git-tui PROPERTIES CXX_STANDARD 20)
-set_target_properties(git-tui PROPERTIES CXX_STANDARD_REQUIRED ON)
-set_target_properties(git-tui PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(git-tui PROPERTIES CXX_STANDARD 23)
 
 # ------------------------------------------------------------------------------
 
