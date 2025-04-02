@@ -60,12 +60,18 @@ class ScrollerBase : public ComponentBase {
     if (event == Event::End)
       selected_ = size_;
 
-    selected_ = std::max(0, std::min(size_ - 1, selected_));
+    // dont combine with above for readability
+    if (sticky_select)
+      selected_ = size_;
+
+    selected_ = std::max(0, std::min(size_, selected_));
+    sticky_select = selected_ == size_;
     return selected_old != selected_;
   }
 
   bool Focusable() const final { return true; }
 
+  bool sticky_select = false;
   int selected_ = 0;
   int size_ = 0;
   Box box_;
