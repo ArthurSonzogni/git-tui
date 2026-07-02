@@ -1,3 +1,10 @@
+# v1.4.0
+- Update FTXUI to v7.0.0.
+
+# v1.3.0
+- Add scroll to `git diff` files.
+- Update FTXUI to v6.1.9.
+
 # v1.2.0
 - Feature: fallback to git for unsupported command.
 - Feature: Add the 'git' command to force using git

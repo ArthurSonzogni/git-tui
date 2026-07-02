@@ -1,15 +1,15 @@
 cmake_minimum_required (VERSION 3.15)
 project(git-tui
   LANGUAGES CXX
-  VERSION 1.3.0
+  VERSION 1.4.0
 )
 
 # --- Dependencies--------------------------------------------------------------
 include(cmake/find_or_fetch_package.cmake)
 
-find_or_fetch_package(ftxui v6.1.9
+find_or_fetch_package(ftxui v7.0.0
   https://github.com/ArthurSonzogni/ftxui
-  v6.1.9
+  v7.0.0
 )
 
 find_or_fetch_package(subprocess v0.4.0
